@@ -16,7 +16,66 @@ func NewMigrationRepoMysql(db *gorm.DB) domain.MigrationRepository {
 
 func (m *MigrationRepoMysql) Migrate(ctx context.Context) error {
 	if err := m.DB.
-		WithContext(ctx).Error; err != nil {
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.User{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.ProductCategory{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Product{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.ProductImage{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.EventCategory{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Event{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Invoice{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Cart{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Invoice{}); err != nil {
 		return err
 	}
 	return nil

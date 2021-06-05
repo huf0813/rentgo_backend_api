@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"github.com/huf0813/rentgo_backend_api/infra/app_driver"
+	"github.com/huf0813/rentgo_backend_api/infra/mysql_driver"
 	"github.com/huf0813/rentgo_backend_api/routes"
 	"github.com/labstack/echo/v4"
 )
@@ -8,7 +11,18 @@ import (
 func main() {
 	e := echo.New()
 
-	routes.NewRoutes(e)
+	db, err := mysql_driver.NewMysqlDriver()
+	if err != nil {
+		panic(err)
+	}
 
-	e.Logger.Fatal(e.Start(":1323"))
+	routes.NewRoutes(e, db)
+
+	appDriver, err := app_driver.NewAppDriver()
+	if err != nil {
+		panic(err)
+	}
+	port := fmt.Sprintf(":%s", appDriver.AppPort)
+
+	e.Logger.Fatal(e.Start(port))
 }
