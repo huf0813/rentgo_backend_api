@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/huf0813/rentgo_backend_api/infra/app_driver"
+	"github.com/huf0813/rentgo_backend_api/infra/authentication"
 	"github.com/huf0813/rentgo_backend_api/infra/mysql_driver"
 	"github.com/huf0813/rentgo_backend_api/routes"
 	"github.com/labstack/echo/v4"
+	"time"
 )
 
 func main() {
@@ -16,7 +18,14 @@ func main() {
 		panic(err)
 	}
 
-	routes.NewRoutes(e, db)
+	authMiddleware, err := authentication.NewAuthMiddleware()
+	if err != nil {
+		panic(err)
+	}
+
+	timeOut := 10 * time.Second
+
+	routes.NewRoutes(e, db, timeOut, authMiddleware)
 
 	appDriver, err := app_driver.NewAppDriver()
 	if err != nil {

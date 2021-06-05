@@ -68,14 +68,7 @@ func (m *MigrationRepoMysql) Migrate(ctx context.Context) error {
 		WithContext(ctx).
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		Migrator().
-		CreateTable(&domain.Cart{}); err != nil {
-		return err
-	}
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.Invoice{}); err != nil {
+		CreateTable(&domain.InvoiceProduct{}); err != nil {
 		return err
 	}
 	return nil
