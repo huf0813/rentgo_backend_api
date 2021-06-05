@@ -1,0 +1,44 @@
+version: '3.7'
+
+x-rentgo-assets-product:
+  &rentgo-assets-product
+  type: bind
+  source: ${APP_SOURCE}
+  target: ${APP_TARGET}
+
+services:
+  app:
+    env_file:
+      - .env
+    container_name: ${APP_CONTAINER}
+    build: .
+    ports:
+      - ${APP_PORT}:8010
+    depends_on:
+      - mysql_db
+    restart: on-failure
+    volumes:
+      - *rentgo-assets-product
+    networks:
+      - rentgo_backend_net
+
+  mysql_db:
+    image: mysql:8
+    env_file:
+      - .env
+    container_name: ${MYSQL_DB_HOST}
+    ports:
+      - ${MYSQL_DB_PORT}:3306
+    environment:
+      - MYSQL_ROOT_HOST=${MYSQL_DB_HOST}
+      - MYSQL_USER=${MYSQL_DB_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_DB_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DB_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_DB_PASSWORD}
+    restart: on-failure
+    networks:
+      - rentgo_backend_net
+
+networks:
+  rentgo_backend_net:
+    driver: bridge
