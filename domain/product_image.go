@@ -7,3 +7,9 @@ type ProductImage struct {
 	Path      string `gorm:"not null" json:"path"`
 	ProductID uint   `json:"product_id"`
 }
+
+type ProductImageRepository interface {
+}
+
+type ProductImageUseCase interface {
+}

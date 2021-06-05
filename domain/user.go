@@ -10,3 +10,9 @@ type User struct {
 	Invoices []Invoice `gorm:"foreignKey:UserID" json:"invoices"`
 	Events   []Event   `gorm:"foreignKey:UserID" json:"events"`
 }
+
+type UserRepository interface {
+}
+
+type UserUseCase interface {
+}

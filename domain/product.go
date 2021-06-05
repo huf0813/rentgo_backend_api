@@ -10,3 +10,9 @@ type Product struct {
 	ProductCategoryID uint           `json:"product_category_id"`
 	Images            []ProductImage `gorm:"foreignKey:ProductID" json:"images"`
 }
+
+type ProductRepository interface {
+}
+
+type ProductUseCase interface {
+}

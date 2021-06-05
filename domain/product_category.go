@@ -7,3 +7,9 @@ type ProductCategory struct {
 	Name     string    `json:"name"`
 	Products []Product `gorm:"foreignKey:ProductCategoryID" json:"products"`
 }
+
+type ProductCategoryRepository interface {
+}
+
+type ProductCategoryUseCase interface {
+}

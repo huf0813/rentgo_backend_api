@@ -12,3 +12,9 @@ type Invoice struct {
 	FinishDate time.Time `json:"finish_date"`
 	UserID     uint      `json:"user_id"`
 }
+
+type InvoiceRepository interface {
+}
+
+type InvoiceUseCase interface {
+}

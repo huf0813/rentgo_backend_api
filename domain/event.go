@@ -9,3 +9,9 @@ type Event struct {
 	LargeArea       string `gorm:"not null" json:"large_area"`
 	EventCategoryID uint   `json:"event_category_id"`
 }
+
+type EventRepository interface {
+}
+
+type EventUseCase interface {
+}

@@ -9,3 +9,9 @@ type EventCategory struct {
 	Name   string  `gorm:"not null" json:"name"`
 	Events []Event `gorm:"foreignKey:EventCategoryID"`
 }
+
+type EventCategoryRepository interface {
+}
+
+type EventCategoryUseCase interface {
+}
