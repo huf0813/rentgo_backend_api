@@ -6,7 +6,7 @@ import (
 
 type EventCategory struct {
 	gorm.Model
-	Name   string  `gorm:"not null" json:"name"`
+	Name   string  `gorm:"unique;not null" json:"name"`
 	Events []Event `gorm:"foreignKey:EventCategoryID"`
 }
 

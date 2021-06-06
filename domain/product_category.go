@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type ProductCategory struct {
 	gorm.Model
-	Name     string    `json:"name"`
+	Name     string    `gorm:"unique;not null" json:"name"`
 	Products []Product `gorm:"foreignKey:ProductCategoryID" json:"products"`
 }
 

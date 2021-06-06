@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/huf0813/rentgo_backend_api/domain"
 	"gorm.io/gorm"
+	"time"
 )
 
 type MigrationRepoMysql struct {
@@ -178,7 +179,14 @@ func (m *MigrationRepoMysql) Migrate(ctx context.Context) error {
 
 func (m *MigrationRepoMysql) Seed(ctx context.Context) error {
 	if err := m.DB.
-		WithContext(ctx).Error; err != nil {
+		WithContext(ctx).
+		Exec("INSERT INTO product_categories(name,created_at,updated_at) VALUES "+
+			"('furniture',?,?), "+
+			"('automotive',?,?);",
+			time.Now(),
+			time.Now(),
+			time.Now(),
+			time.Now()).Error; err != nil {
 		return err
 	}
 	return nil

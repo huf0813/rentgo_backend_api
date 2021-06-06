@@ -14,6 +14,7 @@ type MigrationHandler struct {
 func NewMigrationHandler(e *echo.Echo, m domain.MigrationUseCase) {
 	handler := &MigrationHandler{MigrationUseCase: m}
 	e.GET("/migrate", handler.Migrate)
+	e.GET("/seed", handler.Seed)
 }
 
 func (m *MigrationHandler) Migrate(c echo.Context) error {
@@ -27,5 +28,19 @@ func (m *MigrationHandler) Migrate(c echo.Context) error {
 	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
 		true,
 		"migrated successfully",
+		nil))
+}
+
+func (m *MigrationHandler) Seed(c echo.Context) error {
+	ctx := c.Request().Context()
+	if err := m.MigrationUseCase.Seed(ctx); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"seeded successfully",
 		nil))
 }
