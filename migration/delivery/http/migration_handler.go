@@ -15,6 +15,7 @@ func NewMigrationHandler(e *echo.Echo, m domain.MigrationUseCase) {
 	handler := &MigrationHandler{MigrationUseCase: m}
 	e.GET("/migrate", handler.Migrate)
 	e.GET("/seed", handler.Seed)
+	e.GET("/faker", handler.Faker)
 }
 
 func (m *MigrationHandler) Migrate(c echo.Context) error {
@@ -42,5 +43,19 @@ func (m *MigrationHandler) Seed(c echo.Context) error {
 	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
 		true,
 		"seeded successfully",
+		nil))
+}
+
+func (m *MigrationHandler) Faker(c echo.Context) error {
+	ctx := c.Request().Context()
+	if err := m.MigrationUseCase.Faker(ctx); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"faker generated successfully",
 		nil))
 }

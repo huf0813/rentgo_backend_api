@@ -39,3 +39,14 @@ func (m *MigrationUseCase) Seed(ctx context.Context) error {
 
 	return nil
 }
+
+func (m *MigrationUseCase) Faker(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, m.timeOut)
+	defer cancel()
+
+	if err := m.migrationRepoMysql.Faker(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}

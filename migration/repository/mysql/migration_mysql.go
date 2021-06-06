@@ -2,8 +2,10 @@ package mysql
 
 import (
 	"context"
+	"github.com/bxcodec/faker/v3"
 	"github.com/huf0813/rentgo_backend_api/domain"
 	"gorm.io/gorm"
+	"math/rand"
 	"time"
 )
 
@@ -182,18 +184,20 @@ func (m *MigrationRepoMysql) Seed(ctx context.Context) error {
 		WithContext(ctx).
 		Exec("INSERT INTO product_categories(name,created_at,updated_at) VALUES "+
 			"('furniture',?,?), "+
+			"('household',?,?), "+
 			"('automotive',?,?);",
-			time.Now(),
-			time.Now(),
-			time.Now(),
-			time.Now()).Error; err != nil {
+			time.Now(), time.Now(),
+			time.Now(), time.Now(),
+			time.Now(), time.Now()).Error; err != nil {
 		return err
 	}
 	if err := m.DB.
 		WithContext(ctx).
 		Exec("INSERT INTO event_categories(name,created_at,updated_at) VALUES "+
 			"('indoor',?,?), "+
+			"('birthday',?,?), "+
 			"('outdoor',?,?);",
+			time.Now(), time.Now(),
 			time.Now(), time.Now(),
 			time.Now(), time.Now()).Error; err != nil {
 		return err
@@ -210,6 +214,24 @@ func (m *MigrationRepoMysql) Seed(ctx context.Context) error {
 			time.Now(), time.Now(),
 			time.Now(), time.Now()).Error; err != nil {
 		return err
+	}
+	return nil
+}
+
+func (m *MigrationRepoMysql) Faker(ctx context.Context) error {
+	for i := 0; i < 100; i++ {
+		newProduct := domain.Product{
+			Name:              faker.FirstName(),
+			Price:             uint(rand.Intn(500000-10000) + 10000),
+			Stock:             uint(rand.Intn(50-10) + 10),
+			Star:              uint(rand.Intn(5-1) + 1),
+			ProductCategoryID: uint(rand.Intn(3-1) + 1),
+		}
+		if err := m.DB.
+			WithContext(ctx).
+			Create(&newProduct).Error; err != nil {
+			return err
+		}
 	}
 	return nil
 }

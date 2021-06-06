@@ -22,6 +22,4 @@ RUN mkdir -p ./assets/image/product
 COPY --from=builder /app/main .
 COPY --from=builder /app/.env .
 
-EXPOSE 8010
-
 CMD ["./main"]
