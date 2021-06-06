@@ -1,6 +1,9 @@
 package routes
 
 import (
+	_productHandler "github.com/huf0813/rentgo_backend_api/app/product/delivery/http"
+	_productRepository "github.com/huf0813/rentgo_backend_api/app/product/repository/mysql"
+	_productUseCase "github.com/huf0813/rentgo_backend_api/app/product/usecase"
 	_userHandler "github.com/huf0813/rentgo_backend_api/app/user/delivery/http"
 	_userRepoMysql "github.com/huf0813/rentgo_backend_api/app/user/repository/mysql"
 	_userUseCase "github.com/huf0813/rentgo_backend_api/app/user/usecase"
@@ -35,4 +38,8 @@ func NewRoutes(e *echo.Echo,
 	userRepoMysql := _userRepoMysql.NewUserRepoMysql(db)
 	userUseCase := _userUseCase.NewUserUseCase(userRepoMysql, timeOut)
 	_userHandler.NewUserHandler(e, userGroup, userUseCase)
+
+	productRepository := _productRepository.NewProductRepository(db)
+	productUseCase := _productUseCase.NewProductUseCase(productRepository, timeOut)
+	_productHandler.NewProductHandler(e, productUseCase)
 }

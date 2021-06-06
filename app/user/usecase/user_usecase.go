@@ -3,7 +3,7 @@ package usecase
 import (
 	"context"
 	"github.com/huf0813/rentgo_backend_api/domain"
-	"github.com/huf0813/rentgo_backend_api/infra/authentication"
+	"github.com/huf0813/rentgo_backend_api/infra/auth"
 	"github.com/huf0813/rentgo_backend_api/utils/custom_security"
 	"time"
 )
@@ -33,8 +33,8 @@ func (u *UserUseCase) SignIn(ctx context.Context, email, password string) (strin
 		return "", err
 	}
 
-	duration := 10 * time.Hour
-	token, err := authentication.NewJWT(duration, email)
+	duration := (24 * 30) * time.Hour
+	token, err := auth.NewJWT(duration, email)
 	if err != nil {
 		return "", err
 	}

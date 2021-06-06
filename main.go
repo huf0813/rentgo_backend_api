@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/huf0813/rentgo_backend_api/infra/app_driver"
-	"github.com/huf0813/rentgo_backend_api/infra/authentication"
+	"github.com/huf0813/rentgo_backend_api/infra/auth"
 	"github.com/huf0813/rentgo_backend_api/infra/mysql_driver"
 	"github.com/huf0813/rentgo_backend_api/routes"
 	"github.com/labstack/echo/v4"
@@ -18,7 +18,7 @@ func main() {
 		panic(err)
 	}
 
-	authMiddleware, err := authentication.NewAuthMiddleware()
+	authMiddleware, err := auth.NewAuthMiddleware()
 	if err != nil {
 		panic(err)
 	}

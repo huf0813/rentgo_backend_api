@@ -17,6 +17,13 @@ func NewMigrationHandler(e *echo.Echo, m domain.MigrationUseCase) {
 }
 
 func (m *MigrationHandler) Migrate(c echo.Context) error {
+	ctx := c.Request().Context()
+	if err := m.MigrationUseCase.Migrate(ctx); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
 	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
 		true,
 		"migrated successfully",

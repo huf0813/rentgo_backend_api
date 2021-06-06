@@ -2,7 +2,7 @@ package http
 
 import (
 	"github.com/huf0813/rentgo_backend_api/domain"
-	"github.com/huf0813/rentgo_backend_api/infra/authentication"
+	"github.com/huf0813/rentgo_backend_api/infra/auth"
 	"github.com/huf0813/rentgo_backend_api/utils/custom_response"
 	"github.com/labstack/echo/v4"
 	"net/http"
@@ -66,7 +66,7 @@ func (u *UserHandler) SignUp(c echo.Context) error {
 func (u *UserHandler) Profile(c echo.Context) error {
 	ctx := c.Request().Context()
 	authorization := c.Request().Header.Get("Authorization")
-	claims, err := authentication.NewTokenExtraction(authorization)
+	claims, err := auth.NewTokenExtraction(authorization)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
