@@ -189,5 +189,27 @@ func (m *MigrationRepoMysql) Seed(ctx context.Context) error {
 			time.Now()).Error; err != nil {
 		return err
 	}
+	if err := m.DB.
+		WithContext(ctx).
+		Exec("INSERT INTO event_categories(name,created_at,updated_at) VALUES "+
+			"('indoor',?,?), "+
+			"('outdoor',?,?);",
+			time.Now(), time.Now(),
+			time.Now(), time.Now()).Error; err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Exec("INSERT INTO invoice_categories(name,created_at,updated_at) VALUES "+
+			"('cart',?,?), "+
+			"('on_going',?,?), "+
+			"('completed',?,?), "+
+			"('to_pay',?,?);",
+			time.Now(), time.Now(),
+			time.Now(), time.Now(),
+			time.Now(), time.Now(),
+			time.Now(), time.Now()).Error; err != nil {
+		return err
+	}
 	return nil
 }
