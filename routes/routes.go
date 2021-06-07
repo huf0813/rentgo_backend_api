@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"github.com/go-playground/validator"
 	_productHandler "github.com/huf0813/rentgo_backend_api/app/product/delivery/http"
 	_productRepository "github.com/huf0813/rentgo_backend_api/app/product/repository/mysql"
 	_productUseCase "github.com/huf0813/rentgo_backend_api/app/product/usecase"
@@ -18,10 +19,19 @@ import (
 	"time"
 )
 
+type CustomValidator struct {
+	validator *validator.Validate
+}
+
+func (cv *CustomValidator) Validate(i interface{}) error {
+	return cv.validator.Struct(i)
+}
+
 func NewRoutes(e *echo.Echo,
 	db *gorm.DB,
 	timeOut time.Duration,
 	authMiddleware middleware.JWTConfig) {
+	e.Validator = &CustomValidator{validator: validator.New()}
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
 			true,
