@@ -32,6 +32,7 @@ func NewRoutes(e *echo.Echo,
 	timeOut time.Duration,
 	authMiddleware middleware.JWTConfig) {
 	e.Validator = &CustomValidator{validator: validator.New()}
+
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
 			true,

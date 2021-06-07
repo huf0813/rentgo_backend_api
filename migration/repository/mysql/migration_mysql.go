@@ -2,8 +2,10 @@ package mysql
 
 import (
 	"context"
+	"fmt"
 	"github.com/bxcodec/faker/v3"
 	"github.com/huf0813/rentgo_backend_api/domain"
+	"github.com/huf0813/rentgo_backend_api/utils/custom_security"
 	"gorm.io/gorm"
 	"math/rand"
 	"time"
@@ -48,6 +50,13 @@ func (m *MigrationRepoMysql) Migrate(ctx context.Context) error {
 		Set("gorm:table_options", "ENGINE=InnoDB").
 		Migrator().
 		DropTable(&domain.Invoice{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		DropTable(&domain.Cart{}); err != nil {
 		return err
 	}
 
@@ -166,6 +175,13 @@ func (m *MigrationRepoMysql) Migrate(ctx context.Context) error {
 		CreateTable(&domain.Invoice{}); err != nil {
 		return err
 	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Cart{}); err != nil {
+		return err
+	}
 
 	// layer four
 	if err := m.DB.
@@ -218,19 +234,52 @@ func (m *MigrationRepoMysql) Seed(ctx context.Context) error {
 }
 
 func (m *MigrationRepoMysql) Faker(ctx context.Context) error {
-	for i := 0; i < 100; i++ {
+	/* user */
+	for i := 1; i <= 10; i++ {
+		password, err := custom_security.NewHashingValue("1234567890")
+		if err != nil {
+			return err
+		}
+		newUser := domain.User{
+			Name:     faker.FirstName(),
+			Email:    fmt.Sprintf("user%d@gmail.com", i),
+			Password: password,
+		}
+		if err := m.DB.
+			WithContext(ctx).
+			Create(&newUser).Error; err != nil {
+			return err
+		}
+	}
+	/* user */
+
+	/* product */
+	for i := 1; i <= 100; i++ {
+		// product
 		newProduct := domain.Product{
 			Name:              faker.FirstName(),
 			Price:             uint(rand.Intn(500000-10000) + 10000),
 			Stock:             uint(rand.Intn(50-10) + 10),
-			Star:              uint(rand.Intn(5-1) + 1),
 			ProductCategoryID: uint(rand.Intn(3-1) + 1),
+			UserID:            uint(rand.Intn(10-1) + 1),
 		}
 		if err := m.DB.
 			WithContext(ctx).
 			Create(&newProduct).Error; err != nil {
 			return err
 		}
+
+		// product image
+		newProductImage := domain.ProductImage{
+			ProductID: uint(i),
+			Path:      "default.jpg",
+		}
+		if err := m.DB.
+			WithContext(ctx).
+			Create(&newProductImage).Error; err != nil {
+			return err
+		}
 	}
+	/* product */
 	return nil
 }

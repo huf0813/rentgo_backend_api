@@ -12,6 +12,8 @@ type User struct {
 	Password string    `gorm:"not null" json:"password"`
 	Invoices []Invoice `gorm:"foreignKey:UserID" json:"invoices"`
 	Events   []Event   `gorm:"foreignKey:UserID" json:"events"`
+	Carts    []Cart    `gorm:"foreignKey:UserID" json:"carts"`
+	Products []Product `gorm:"foreignKey:UserID" json:"products"`
 }
 
 type UserSignInRequest struct {

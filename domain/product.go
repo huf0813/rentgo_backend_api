@@ -10,22 +10,23 @@ type Product struct {
 	Name              string           `gorm:"not null" json:"name"`
 	Price             uint             `gorm:"not null" json:"price"`
 	Stock             uint             `gorm:"not null" json:"stock"`
-	Star              uint             `gorm:"not null" json:"star"`
 	ProductCategoryID uint             `json:"product_category_id"`
+	UserID            uint             `json:"user_id"`
 	ProductImages     []ProductImage   `gorm:"foreignKey:ProductID" json:"product_images"`
 	InvoiceReviews    []InvoiceProduct `gorm:"foreignKey:ProductID" json:"invoice_reviews"`
 	EventProducts     []EventProduct   `gorm:"foreignKey:ProductID" json:"event_products"`
+	Carts             []Cart           `gorm:"foreignKey:ProductID" json:"carts"`
 }
 
 type ProductResponse struct {
-	ID              uint          `json:"id"`
-	Name            string        `json:"name"`
-	Price           uint          `json:"price"`
-	Stock           uint          `json:"stock"`
-	Star            uint          `json:"star"`
-	ProductCategory string        `json:"product_category"`
-	Images          []interface{} `json:"images"`
-	Reviews         []interface{} `json:"reviews"`
+	ID              uint           `json:"id"`
+	Name            string         `json:"name"`
+	Price           uint           `json:"price"`
+	Stock           uint           `json:"stock"`
+	Star            uint           `json:"star"`
+	ProductCategory string         `json:"product_category"`
+	Vendor          string         `json:"vendor"`
+	ProductImages   []ProductImage `gorm:"foreignKey:ProductID" json:"product_images"`
 }
 
 type ProductRepository interface {

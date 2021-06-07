@@ -18,14 +18,16 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 	var product domain.ProductResponse
 	if err := p.DB.
 		WithContext(ctx).
-		Model(&domain.Product{}).
+		Table("products").
+		Preload("ProductImages").
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
 			"products.id, "+
-			"products.star, "+
+			"users.name as vendor, "+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
+		Joins("JOIN users ON products.user_id = users.id").
 		Where("products.id = ?", id).
 		First(&product).Error; err != nil {
 		return domain.ProductResponse{}, err
@@ -42,9 +44,10 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 			"products.price, "+
 			"products.id, "+
 			"products.stock, "+
-			"products.star, "+
+			"users.name as vendor, "+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
+		Joins("JOIN users ON products.user_id = users.id").
 		Where("product_categories.name LIKE ?", category+"%").
 		Find(&result).
 		Error; err != nil {
@@ -62,9 +65,10 @@ func (p ProductRepository) SearchProduct(ctx context.Context, name string) ([]do
 			"products.price, "+
 			"products.stock, "+
 			"products.id, "+
-			"products.star, "+
+			"users.name as vendor, "+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
+		Joins("JOIN users ON products.user_id = users.id").
 		Where("products.name LIKE ?", name+"%").
 		Find(&result).Error; err != nil {
 		return nil, err
