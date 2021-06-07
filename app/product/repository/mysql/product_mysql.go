@@ -22,6 +22,7 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
+			"products.id, "+
 			"products.star, "+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
@@ -39,6 +40,7 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 		Model(&domain.Product{}).
 		Select("products.name, "+
 			"products.price, "+
+			"products.id, "+
 			"products.stock, "+
 			"products.star, "+
 			"product_categories.name as product_category").
@@ -59,6 +61,7 @@ func (p ProductRepository) SearchProduct(ctx context.Context, name string) ([]do
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
+			"products.id, "+
 			"products.star, "+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").

@@ -18,6 +18,7 @@ type Product struct {
 }
 
 type ProductResponse struct {
+	ID              uint          `json:"id"`
 	Name            string        `json:"name"`
 	Price           uint          `json:"price"`
 	Stock           uint          `json:"stock"`
