@@ -15,8 +15,8 @@ type ProductHandler struct {
 func NewProductHandler(e *echo.Echo, p domain.ProductUseCase) {
 	handler := &ProductHandler{ProductUseCase: p}
 	e.GET("/product", handler.SearchProduct)
-	e.GET("/product/:id", handler.FetchByID)
-	e.GET("/product/:category", handler.FetchByCategory)
+	e.GET("/product/detail/:id", handler.FetchByID)
+	e.GET("/product/category/:category", handler.FetchByCategory)
 }
 
 func (p *ProductHandler) SearchProduct(c echo.Context) error {

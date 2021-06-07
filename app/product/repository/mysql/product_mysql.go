@@ -19,13 +19,14 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 	if err := p.DB.
 		WithContext(ctx).
 		Model(&domain.Product{}).
-		Select("product.name, "+
-			"product.price, "+
-			"product.stock, "+
-			"product.star, "+
-			"product_category.name as product_category").
-		First(&product, id).
-		Error; err != nil {
+		Select("products.name, "+
+			"products.price, "+
+			"products.stock, "+
+			"products.star, "+
+			"product_categories.name as product_category").
+		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
+		Where("products.id = ?", id).
+		First(&product).Error; err != nil {
 		return domain.ProductResponse{}, err
 	}
 	return product, nil
@@ -36,12 +37,13 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 	if err := p.DB.
 		WithContext(ctx).
 		Model(&domain.Product{}).
-		Select("product.name, "+
-			"product.price, "+
-			"product.stock, "+
-			"product.star, "+
-			"product_category.name as product_category").
-		Where("product_category.name LIKE ?", category+"%").
+		Select("products.name, "+
+			"products.price, "+
+			"products.stock, "+
+			"products.star, "+
+			"product_categories.name as product_category").
+		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
+		Where("product_categories.name LIKE ?", category+"%").
 		Find(&result).
 		Error; err != nil {
 		return nil, err
@@ -54,12 +56,14 @@ func (p ProductRepository) SearchProduct(ctx context.Context, name string) ([]do
 	if err := p.DB.
 		WithContext(ctx).
 		Model(&domain.Product{}).
-		Select("product.name, "+
-			"product.price, "+
-			"product.stock, "+
-			"product.star, "+
-			"product_category.name as product_category").
-		Where("product.name LIKE ?", name+"%").Error; err != nil {
+		Select("products.name, "+
+			"products.price, "+
+			"products.stock, "+
+			"products.star, "+
+			"product_categories.name as product_category").
+		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
+		Where("products.name LIKE ?", name+"%").
+		Find(&result).Error; err != nil {
 		return nil, err
 	}
 	return result, nil
