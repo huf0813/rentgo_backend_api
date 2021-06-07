@@ -205,7 +205,6 @@ func (m *MigrationRepoMysql) Seed(ctx context.Context) error {
 	if err := m.DB.
 		WithContext(ctx).
 		Exec("INSERT INTO invoice_categories(name,created_at,updated_at) VALUES "+
-			"('cart',?,?), "+
 			"('on_going',?,?), "+
 			"('completed',?,?), "+
 			"('to_pay',?,?);",
