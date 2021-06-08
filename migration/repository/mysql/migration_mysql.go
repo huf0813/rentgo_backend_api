@@ -281,5 +281,39 @@ func (m *MigrationRepoMysql) Faker(ctx context.Context) error {
 		}
 	}
 	/* product */
+
+	/* invoices */
+	for i := 1; i <= 10; i++ {
+		newInvoices := domain.Invoice{
+			ReceiptNumber:     custom_security.NewRandomShortUUID(),
+			StartDate:         time.Now(),
+			FinishDate:        time.Now().Add((30 * 24) * time.Hour),
+			UserID:            uint(rand.Intn(10-1) + 1),
+			InvoiceCategoryID: uint(rand.Intn(3-1) + 1),
+		}
+		if err := m.DB.
+			WithContext(ctx).
+			Create(&newInvoices).Error; err != nil {
+			return err
+		}
+	}
+	/* invoices */
+
+	/* invoice products */
+	for i := 1; i <= 10; i++ {
+		newInvoicesProduct := domain.InvoiceProduct{
+			ProductID: uint(rand.Intn(3-1) + 1),
+			InvoiceID: uint(rand.Intn(3-1) + 1),
+			Quantity:  1,
+			Rating:    uint(rand.Intn(5-1) + 1),
+			Review:    "mantap",
+		}
+		if err := m.DB.
+			WithContext(ctx).
+			Create(&newInvoicesProduct).Error; err != nil {
+			return err
+		}
+	}
+	/* invoice products */
 	return nil
 }

@@ -8,7 +8,7 @@ import (
 
 type Invoice struct {
 	gorm.Model
-	ReceiptNumber     uint             `json:"receipt_number"`
+	ReceiptNumber     string           `json:"receipt_number"`
 	StartDate         time.Time        `json:"start_date"`
 	FinishDate        time.Time        `json:"finish_date"`
 	UserID            uint             `json:"user_id"`

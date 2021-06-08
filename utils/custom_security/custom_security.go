@@ -1,6 +1,9 @@
 package custom_security
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"github.com/lithammer/shortuuid/v3"
+	"golang.org/x/crypto/bcrypt"
+)
 
 func NewHashingValue(value string) (string, error) {
 	p := []byte(value)
@@ -17,4 +20,8 @@ func NewValidatingValue(hashedValue, targetValue string) error {
 	target := []byte(targetValue)
 	err := bcrypt.CompareHashAndPassword(source, target)
 	return err
+}
+
+func NewRandomShortUUID() string {
+	return shortuuid.New()
 }
