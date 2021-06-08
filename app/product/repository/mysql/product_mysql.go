@@ -14,12 +14,13 @@ func NewProductRepository(db *gorm.DB) domain.ProductRepository {
 	return &ProductRepository{DB: db}
 }
 
-func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.ProductResponse, error) {
-	var product domain.ProductResponse
+func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.ProductDetailResponse, error) {
+	var product domain.ProductDetailResponse
 	if err := p.DB.
 		WithContext(ctx).
 		Table("products").
 		Preload("ProductImages").
+		Preload("ProductReviews").
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
@@ -30,7 +31,7 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 		Joins("JOIN users ON products.user_id = users.id").
 		Where("products.id = ?", id).
 		First(&product).Error; err != nil {
-		return domain.ProductResponse{}, err
+		return domain.ProductDetailResponse{}, err
 	}
 	return product, nil
 }
@@ -39,18 +40,20 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 	var result []domain.ProductResponse
 	if err := p.DB.
 		WithContext(ctx).
-		Model(&domain.Product{}).
+		Table("products").
+		Preload("ProductImages").
 		Select("products.name, "+
 			"products.price, "+
-			"products.id, "+
 			"products.stock, "+
+			"products.id, "+
 			"users.name as vendor, "+
+			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products WHERE invoice_products.product_id = products.id) as star, "+
+			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
 		Where("product_categories.name LIKE ?", category+"%").
-		Find(&result).
-		Error; err != nil {
+		Find(&result).Error; err != nil {
 		return nil, err
 	}
 	return result, nil
@@ -60,12 +63,15 @@ func (p ProductRepository) SearchProduct(ctx context.Context, name string) ([]do
 	var result []domain.ProductResponse
 	if err := p.DB.
 		WithContext(ctx).
-		Model(&domain.Product{}).
+		Table("products").
+		Preload("ProductImages").
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
+			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products WHERE invoice_products.product_id = products.id) as star, "+
+			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").

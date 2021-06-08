@@ -18,13 +18,13 @@ func NewProductUseCase(p domain.ProductRepository, timeOut time.Duration) domain
 	}
 }
 
-func (p *ProductUseCase) FetchByID(ctx context.Context, id int) (domain.ProductResponse, error) {
+func (p *ProductUseCase) FetchByID(ctx context.Context, id int) (domain.ProductDetailResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, p.timeOut)
 	defer cancel()
 
 	res, err := p.productRepoMysql.FetchByID(ctx, id)
 	if err != nil {
-		return domain.ProductResponse{}, err
+		return domain.ProductDetailResponse{}, err
 	}
 
 	return res, nil
