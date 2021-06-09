@@ -74,7 +74,6 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 	if err := p.DB.
 		WithContext(ctx).
 		Table("products").
-		Preload("ProductImages").
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
