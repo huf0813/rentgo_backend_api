@@ -16,6 +16,7 @@ func NewMigrationHandler(e *echo.Echo, m domain.MigrationUseCase) {
 	e.GET("/migrate", handler.Migrate)
 	e.GET("/seed", handler.Seed)
 	e.GET("/faker", handler.Faker)
+	e.GET("/drop", handler.Drop)
 }
 
 func (m *MigrationHandler) Migrate(c echo.Context) error {
@@ -57,5 +58,19 @@ func (m *MigrationHandler) Faker(c echo.Context) error {
 	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
 		true,
 		"faker generated successfully",
+		nil))
+}
+
+func (m *MigrationHandler) Drop(c echo.Context) error {
+	ctx := c.Request().Context()
+	if err := m.MigrationUseCase.Drop(ctx); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"Drop tables successfully",
 		nil))
 }

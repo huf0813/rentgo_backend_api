@@ -29,6 +29,17 @@ func (m *MigrationUseCase) Migrate(ctx context.Context) error {
 	return nil
 }
 
+func (m *MigrationUseCase) Drop(ctx context.Context) error {
+	ctx, cancel := context.WithTimeout(ctx, m.timeOut)
+	defer cancel()
+
+	if err := m.migrationRepoMysql.Drop(ctx); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *MigrationUseCase) Seed(ctx context.Context) error {
 	ctx, cancel := context.WithTimeout(ctx, m.timeOut)
 	defer cancel()

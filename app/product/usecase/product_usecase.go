@@ -18,13 +18,13 @@ func NewProductUseCase(p domain.ProductRepository, timeOut time.Duration) domain
 	}
 }
 
-func (p *ProductUseCase) FetchByID(ctx context.Context, id int) (domain.ProductDetailResponse, error) {
+func (p *ProductUseCase) FetchByID(ctx context.Context, id int) (domain.ProductResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, p.timeOut)
 	defer cancel()
 
 	res, err := p.productRepoMysql.FetchByID(ctx, id)
 	if err != nil {
-		return domain.ProductDetailResponse{}, err
+		return domain.ProductResponse{}, err
 	}
 
 	return res, nil
@@ -47,6 +47,18 @@ func (p ProductUseCase) SearchProduct(ctx context.Context, name string) ([]domai
 	defer cancel()
 
 	res, err := p.productRepoMysql.SearchProduct(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (p *ProductUseCase) FetchReviewsByID(ctx context.Context, id int) ([]domain.ProductReviewResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, p.timeOut)
+	defer cancel()
+
+	res, err := p.productRepoMysql.FetchReviewsByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}

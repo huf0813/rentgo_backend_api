@@ -16,6 +16,7 @@ func NewProductHandler(e *echo.Echo, p domain.ProductUseCase) {
 	handler := &ProductHandler{ProductUseCase: p}
 	e.GET("/product", handler.SearchProduct)
 	e.GET("/product/detail/:id", handler.FetchByID)
+	e.GET("/product/detail/:id/reviews", handler.FetchReviewsByID)
 	e.GET("/product/category/:category", handler.FetchByCategory)
 }
 
@@ -56,13 +57,41 @@ func (p *ProductHandler) FetchByID(c echo.Context) error {
 			custom_response.NewCustomResponse(
 				false,
 				err.Error(),
-				res))
+				nil))
 	}
 
 	return c.JSON(http.StatusOK,
 		custom_response.NewCustomResponse(
 			true,
 			"get product by id successfully",
+			res))
+}
+
+func (p *ProductHandler) FetchReviewsByID(c echo.Context) error {
+	id := c.Param("id")
+	idInteger, err := strconv.Atoi(id)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest,
+			custom_response.NewCustomResponse(
+				false,
+				err.Error(),
+				nil))
+	}
+
+	ctx := c.Request().Context()
+	res, err := p.ProductUseCase.FetchReviewsByID(ctx, idInteger)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError,
+			custom_response.NewCustomResponse(
+				false,
+				err.Error(),
+				nil))
+	}
+
+	return c.JSON(http.StatusOK,
+		custom_response.NewCustomResponse(
+			true,
+			"get product's reviews by id successfully",
 			res))
 }
 

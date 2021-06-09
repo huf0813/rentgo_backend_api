@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"context"
 	"gorm.io/gorm"
 	"time"
 )
@@ -17,13 +16,7 @@ type Invoice struct {
 }
 
 type InvoiceRepository interface {
-	Fetch(ctx context.Context)
-	FetchByID(ctx context.Context)
-	CreateReview(ctx context.Context, review string)
 }
 
 type InvoiceUseCase interface {
-	Fetch(ctx context.Context)
-	FetchByID(ctx context.Context)
-	CreateReview(ctx context.Context, review string)
 }
