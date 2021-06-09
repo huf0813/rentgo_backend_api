@@ -15,7 +15,8 @@ type CartHandler struct {
 
 func NewCartHandler(userGroup *echo.Group, c domain.CartUseCase) {
 	handler := &CartHandler{CartUseCase: c}
-	userGroup.POST("/add_product_to_cart/:product_id", handler.AddProductToCart)
+	userGroup.POST("/cart/create/:product_id", handler.AddProductToCart)
+	userGroup.GET("/cart", handler.FetchCart)
 }
 
 func (c *CartHandler) AddProductToCart(echoContext echo.Context) error {
@@ -56,11 +57,39 @@ func (c *CartHandler) AddProductToCart(echoContext echo.Context) error {
 		productIDInteger,
 		token.Email,
 		addCartRequest); err != nil {
-		return err
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
 	}
 
 	return echoContext.JSON(http.StatusOK, custom_response.NewCustomResponse(
 		true,
 		"add to cart successfully",
 		nil))
+}
+
+func (c *CartHandler) FetchCart(echoContext echo.Context) error {
+	bearer := echoContext.Request().Header.Get("Authorization")
+	token, err := auth.NewTokenExtraction(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	ctx := echoContext.Request().Context()
+	result, err := c.CartUseCase.FetchCart(ctx, token.Email)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	return echoContext.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"fetch cart successfully",
+		result))
 }

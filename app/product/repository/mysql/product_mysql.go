@@ -18,8 +18,11 @@ func (p *ProductRepository) FetchImagesByID(ctx context.Context, id int) ([]doma
 	var result []domain.ProductImageResponse
 	if err := p.DB.
 		WithContext(ctx).
-		Table("products").
-		Select("product_images.path as path").
+		Model(&domain.Product{}).
+		//Table("products").
+		Select(
+			"product_images.path as path, "+
+				"product_images.id as product_image_id").
 		Joins("JOIN product_images ON products.id = product_images.product_id").
 		Where("products.id = ?", id).
 		Find(&result).Error; err != nil {
@@ -32,9 +35,11 @@ func (p *ProductRepository) FetchReviewsByID(ctx context.Context, id int) ([]dom
 	var result []domain.ProductReviewResponse
 	if err := p.DB.
 		WithContext(ctx).
-		Table("products").
+		Model(&domain.Product{}).
+		//Table("products").
 		Select(
-			"users.name as user_name, "+
+			"invoice_products.id as product_review_id, "+
+				"users.name as user_name, "+
 				"invoice_products.review as product_review, "+
 				"invoice_products.rating as product_rating").
 		Joins("JOIN invoice_products ON invoice_products.product_id = products.id").
@@ -51,7 +56,8 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 	var product domain.ProductResponse
 	if err := p.DB.
 		WithContext(ctx).
-		Table("products").
+		Model(&domain.Product{}).
+		//Table("products").
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
@@ -73,7 +79,8 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 	var result []domain.ProductResponse
 	if err := p.DB.
 		WithContext(ctx).
-		Table("products").
+		Model(&domain.Product{}).
+		//Table("products").
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
@@ -95,7 +102,8 @@ func (p ProductRepository) SearchProduct(ctx context.Context, name string) ([]do
 	var result []domain.ProductResponse
 	if err := p.DB.
 		WithContext(ctx).
-		Table("products").
+		//Table("products").
+		Model(&domain.Product{}).
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+

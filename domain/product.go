@@ -30,12 +30,14 @@ type ProductResponse struct {
 }
 
 type ProductReviewResponse struct {
+	ID            int    `json:"product_review_id"`
 	UserName      string `json:"user_name"`
 	ProductRating uint   `json:"product_rating"`
 	ProductReview string `json:"product_review"`
 }
 
 type ProductImageResponse struct {
+	ID   int    `json:"product_image_id"`
 	Path string `json:"path"`
 }
 

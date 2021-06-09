@@ -40,3 +40,20 @@ func (c *CartUseCase) AddProductToCart(ctx context.Context, productID int, email
 
 	return nil
 }
+
+func (c *CartUseCase) FetchCart(ctx context.Context, email string) ([]domain.CartResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, c.timeOut)
+	defer cancel()
+
+	user, err := c.userRepoMysql.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.cartRepoMysql.FetchCart(ctx, user.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}

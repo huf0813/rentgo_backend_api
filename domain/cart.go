@@ -13,8 +13,11 @@ type Cart struct {
 }
 
 type CartResponse struct {
-	ProductName string `json:"product_name"`
-	Quantity    uint   `json:"quantity"`
+	ID           int    `json:"cart_id"`
+	Vendor       string `json:"product_vendor"`
+	ProductName  string `json:"product_name"`
+	ProductPrice string `json:"product_price"`
+	Quantity     uint   `json:"product_quantity"`
 }
 
 type CartAddProductRequest struct {
@@ -22,9 +25,18 @@ type CartAddProductRequest struct {
 }
 
 type CartRepository interface {
-	AddProductToCart(ctx context.Context, quantity int, productID, userID uint) error
+	AddProductToCart(ctx context.Context,
+		quantity int,
+		productID,
+		userID uint) error
+	FetchCart(ctx context.Context,
+		userID uint) ([]CartResponse, error)
 }
 
 type CartUseCase interface {
-	AddProductToCart(ctx context.Context, productID int, email string, q *CartAddProductRequest) error
+	AddProductToCart(ctx context.Context,
+		productID int,
+		email string,
+		q *CartAddProductRequest) error
+	FetchCart(ctx context.Context, email string) ([]CartResponse, error)
 }
