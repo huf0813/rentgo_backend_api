@@ -5,7 +5,7 @@ import (
 )
 
 func NewDateConverter(val string) (time.Time, error) {
-	layout := "2006-01-02T15:04:05.000Z"
+	layout := "2006-01-02 15:04:05"
 	t, err := time.Parse(layout, val)
 
 	if err != nil {

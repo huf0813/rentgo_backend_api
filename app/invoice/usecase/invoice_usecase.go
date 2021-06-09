@@ -47,6 +47,10 @@ func (i *InvoiceUseCase) CreateCheckOut(ctx context.Context,
 			return err
 		}
 		invoiceProducts = append(invoiceProducts, res)
+		if err := i.cartRepoMysql.DeleteCartByID(ctx,
+			user.ID, uint(v)); err != nil {
+			return err
+		}
 	}
 
 	if err := i.invoiceRepoMysql.CreateCheckOut(ctx,

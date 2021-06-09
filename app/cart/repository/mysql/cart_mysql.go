@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/huf0813/rentgo_backend_api/domain"
 	"gorm.io/gorm"
+	"log"
 )
 
 type CartRepoMysql struct {
@@ -47,7 +48,11 @@ func (c *CartRepoMysql) FetchCart(ctx context.Context, userID uint) ([]domain.Ca
 			"JOIN users vendor on p.user_id = vendor.id "+
 			"where user_cart.id = ?", userID).
 		Rows()
-	defer rows.Close()
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
 	if err != nil {
 		return nil, err
 	}
@@ -74,4 +79,19 @@ func (c *CartRepoMysql) FetchCartByID(ctx context.Context, userID, cartID uint) 
 	}
 
 	return row, nil
+}
+
+func (c *CartRepoMysql) DeleteCartByID(ctx context.Context, userID, cartID uint) error {
+	if err := c.DB.
+		WithContext(ctx).
+		Exec("DELETE FROM carts "+
+			"WHERE id = ? "+
+			"AND user_id = ?",
+			cartID,
+			userID).
+		Error; err != nil {
+		return err
+	}
+
+	return nil
 }
