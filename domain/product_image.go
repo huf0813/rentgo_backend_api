@@ -8,12 +8,6 @@ type ProductImage struct {
 	ProductID uint   `json:"product_id"`
 }
 
-type ProductImageResponse struct {
-	gorm.Model
-	Path      string `json:"path"`
-	ProductID uint   `json:"product_id"`
-}
-
 type ProductImageRepository interface {
 }
 

@@ -18,6 +18,18 @@ func NewProductUseCase(p domain.ProductRepository, timeOut time.Duration) domain
 	}
 }
 
+func (p *ProductUseCase) FetchImagesByID(ctx context.Context, id int) ([]domain.ProductImageResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, p.timeOut)
+	defer cancel()
+
+	res, err := p.productRepoMysql.FetchImagesByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (p *ProductUseCase) FetchByID(ctx context.Context, id int) (domain.ProductResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, p.timeOut)
 	defer cancel()

@@ -19,15 +19,14 @@ type Product struct {
 }
 
 type ProductResponse struct {
-	ID              uint           `json:"id"`
-	Name            string         `json:"name"`
-	Price           uint           `json:"price"`
-	Stock           uint           `json:"stock"`
-	Star            float64        `json:"star"`
-	Reviews         uint           `json:"reviews"`
-	ProductCategory string         `json:"product_category"`
-	Vendor          string         `json:"vendor"`
-	ProductImages   []ProductImage `gorm:"foreignKey:ProductID" json:"product_images"`
+	ID              uint    `json:"id"`
+	Name            string  `json:"name"`
+	Price           uint    `json:"price"`
+	Stock           uint    `json:"stock"`
+	Star            float64 `json:"star"`
+	Reviews         uint    `json:"reviews"`
+	ProductCategory string  `json:"product_category"`
+	Vendor          string  `json:"vendor"`
 }
 
 type ProductReviewResponse struct {
@@ -36,15 +35,21 @@ type ProductReviewResponse struct {
 	ProductReview string `json:"product_review"`
 }
 
+type ProductImageResponse struct {
+	Path string `json:"path"`
+}
+
 type ProductRepository interface {
 	FetchByID(ctx context.Context, id int) (ProductResponse, error)
 	FetchByCategory(ctx context.Context, category string) ([]ProductResponse, error)
 	SearchProduct(ctx context.Context, name string) ([]ProductResponse, error)
 	FetchReviewsByID(ctx context.Context, id int) ([]ProductReviewResponse, error)
+	FetchImagesByID(ctx context.Context, id int) ([]ProductImageResponse, error)
 }
 type ProductUseCase interface {
 	FetchByID(ctx context.Context, id int) (ProductResponse, error)
 	FetchByCategory(ctx context.Context, category string) ([]ProductResponse, error)
 	SearchProduct(ctx context.Context, name string) ([]ProductResponse, error)
 	FetchReviewsByID(ctx context.Context, id int) ([]ProductReviewResponse, error)
+	FetchImagesByID(ctx context.Context, id int) ([]ProductImageResponse, error)
 }

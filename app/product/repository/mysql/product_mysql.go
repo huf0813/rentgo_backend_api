@@ -14,17 +14,31 @@ func NewProductRepository(db *gorm.DB) domain.ProductRepository {
 	return &ProductRepository{DB: db}
 }
 
+func (p *ProductRepository) FetchImagesByID(ctx context.Context, id int) ([]domain.ProductImageResponse, error) {
+	var result []domain.ProductImageResponse
+	if err := p.DB.
+		WithContext(ctx).
+		Table("products").
+		Select("product_images.path as path").
+		Joins("JOIN product_images ON products.id = product_images.product_id").
+		Where("products.id = ?", id).
+		Find(&result).Error; err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (p *ProductRepository) FetchReviewsByID(ctx context.Context, id int) ([]domain.ProductReviewResponse, error) {
 	var result []domain.ProductReviewResponse
 	if err := p.DB.
 		WithContext(ctx).
-		Table("product").
+		Table("products").
 		Select(
 			"users.name as user_name, "+
-				"invoices_product.review as product_review, "+
-				"invoices_product.rating as product_rating").
-		Joins("JOIN invoices_product ON products.product_id = products.id").
-		Joins("JOIN invoices ON invoices_product.invoice_id = invoices.id").
+				"invoice_products.review as product_review, "+
+				"invoice_products.rating as product_rating").
+		Joins("JOIN invoice_products ON invoice_products.product_id = products.id").
+		Joins("JOIN invoices ON invoice_products.invoice_id = invoices.id").
 		Joins("JOIN users ON invoices.user_id = users.id").
 		Where("products.id = ?", id).
 		Find(&result).Error; err != nil {
@@ -38,12 +52,13 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 	if err := p.DB.
 		WithContext(ctx).
 		Table("products").
-		Preload("ProductImages").
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
+			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products WHERE invoice_products.product_id = products.id) as star, "+
+			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
@@ -82,7 +97,6 @@ func (p ProductRepository) SearchProduct(ctx context.Context, name string) ([]do
 	if err := p.DB.
 		WithContext(ctx).
 		Table("products").
-		Preload("ProductImages").
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
