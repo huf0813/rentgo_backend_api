@@ -27,6 +27,11 @@ type UserSignUpRequest struct {
 	Name     string `json:"name" validate:"required"`
 }
 
+type UserProfileResponse struct {
+	Email string `json:"email"`
+	Name  string `json:"name"`
+}
+
 type UserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	SignUp(ctx context.Context, name, email, password string) error
@@ -35,5 +40,5 @@ type UserRepository interface {
 type UserUseCase interface {
 	SignIn(ctx context.Context, email, password string) (string, error)
 	SignUp(ctx context.Context, name, email, password string) error
-	Profile(ctx context.Context, email string) (User, error)
+	Profile(ctx context.Context, email string) (UserProfileResponse, error)
 }

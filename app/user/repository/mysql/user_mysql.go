@@ -20,7 +20,6 @@ func (u *UserRepoMysql) GetUserByEmail(ctx context.Context, email string) (domai
 	result := u.DB.
 		WithContext(ctx).
 		Where("email = ?", email).
-		Where("email = ?", email).
 		First(&user)
 	if err := result.Error; err != nil {
 		return domain.User{}, err
