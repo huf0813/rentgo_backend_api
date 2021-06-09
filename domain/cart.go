@@ -31,6 +31,8 @@ type CartRepository interface {
 		userID uint) error
 	FetchCart(ctx context.Context,
 		userID uint) ([]CartResponse, error)
+	FetchCartByID(ctx context.Context,
+		userID, cartID uint) (Cart, error)
 }
 
 type CartUseCase interface {

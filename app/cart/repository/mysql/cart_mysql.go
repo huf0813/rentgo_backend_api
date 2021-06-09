@@ -61,3 +61,17 @@ func (c *CartRepoMysql) FetchCart(ctx context.Context, userID uint) ([]domain.Ca
 
 	return result, nil
 }
+
+func (c *CartRepoMysql) FetchCartByID(ctx context.Context, userID, cartID uint) (domain.Cart, error) {
+	var row domain.Cart
+
+	if err := c.DB.
+		WithContext(ctx).
+		Model(&domain.Cart{}).
+		Where("carts.id = ?", cartID).
+		First(&row, userID).Error; err != nil {
+		return domain.Cart{}, err
+	}
+
+	return row, nil
+}

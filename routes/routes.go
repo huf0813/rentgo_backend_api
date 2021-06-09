@@ -5,6 +5,9 @@ import (
 	_cartHandler "github.com/huf0813/rentgo_backend_api/app/cart/delivery/http"
 	_cartRepoMysql "github.com/huf0813/rentgo_backend_api/app/cart/repository/mysql"
 	_cartUseCase "github.com/huf0813/rentgo_backend_api/app/cart/usecase"
+	_invoiceHandler "github.com/huf0813/rentgo_backend_api/app/invoice/delivery/http"
+	_invoiceRepoMysql "github.com/huf0813/rentgo_backend_api/app/invoice/repository/mysql"
+	_invoiceUseCase "github.com/huf0813/rentgo_backend_api/app/invoice/usecase"
 	_productHandler "github.com/huf0813/rentgo_backend_api/app/product/delivery/http"
 	_productRepository "github.com/huf0813/rentgo_backend_api/app/product/repository/mysql"
 	_productUseCase "github.com/huf0813/rentgo_backend_api/app/product/usecase"
@@ -58,6 +61,13 @@ func NewRoutes(e *echo.Echo,
 		userRepoMysql,
 		timeOut)
 	_cartHandler.NewCartHandler(userGroup, cartUseCase)
+
+	invoiceRepoMysql := _invoiceRepoMysql.NewInvoiceRepoMysql(db)
+	invoiceUseCase := _invoiceUseCase.NewInvoiceUseCase(invoiceRepoMysql,
+		cartRepoMysql,
+		userRepoMysql,
+		timeOut)
+	_invoiceHandler.NewInvoiceHandler(userGroup, invoiceUseCase)
 
 	productRepository := _productRepository.NewProductRepository(db)
 	productUseCase := _productUseCase.NewProductUseCase(productRepository, timeOut)
