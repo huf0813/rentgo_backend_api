@@ -2,6 +2,9 @@ package routes
 
 import (
 	"github.com/go-playground/validator"
+	_cartHandler "github.com/huf0813/rentgo_backend_api/app/cart/delivery/http"
+	_cartRepoMysql "github.com/huf0813/rentgo_backend_api/app/cart/repository/mysql"
+	_cartUseCase "github.com/huf0813/rentgo_backend_api/app/cart/usecase"
 	_productHandler "github.com/huf0813/rentgo_backend_api/app/product/delivery/http"
 	_productRepository "github.com/huf0813/rentgo_backend_api/app/product/repository/mysql"
 	_productUseCase "github.com/huf0813/rentgo_backend_api/app/product/usecase"
@@ -49,6 +52,12 @@ func NewRoutes(e *echo.Echo,
 	userRepoMysql := _userRepoMysql.NewUserRepoMysql(db)
 	userUseCase := _userUseCase.NewUserUseCase(userRepoMysql, timeOut)
 	_userHandler.NewUserHandler(e, userGroup, userUseCase)
+
+	cartRepoMysql := _cartRepoMysql.NewCartRepoMysql(db)
+	cartUseCase := _cartUseCase.NewCartUseCase(cartRepoMysql,
+		userRepoMysql,
+		timeOut)
+	_cartHandler.NewCartHandler(userGroup, cartUseCase)
 
 	productRepository := _productRepository.NewProductRepository(db)
 	productUseCase := _productUseCase.NewProductUseCase(productRepository, timeOut)

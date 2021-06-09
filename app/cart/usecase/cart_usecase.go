@@ -8,42 +8,33 @@ import (
 
 type CartUseCase struct {
 	cartRepoMysql domain.CartRepository
+	userRepoMysql domain.UserRepository
 	timeOut       time.Duration
 }
 
-func NewCartUseCase(c domain.CartRepository, timeOut time.Duration) domain.CartUseCase {
+func NewCartUseCase(c domain.CartRepository,
+	u domain.UserRepository,
+	timeOut time.Duration) domain.CartUseCase {
 	return &CartUseCase{
 		cartRepoMysql: c,
+		userRepoMysql: u,
 		timeOut:       timeOut,
 	}
 }
 
-func (c *CartUseCase) FetchCart(ctx context.Context, email string) error {
-	panic("implement me")
-}
-
-func (c *CartUseCase) AddProduct(ctx context.Context, email string, productID, quantity int) error {
+func (c *CartUseCase) AddProductToCart(ctx context.Context, productID int, email string, q *domain.CartAddProductRequest) error {
 	ctx, cancel := context.WithTimeout(ctx, c.timeOut)
 	defer cancel()
 
-	if err := c.cartRepoMysql.AddProduct(ctx,
-		email,
-		productID,
-		quantity); err != nil {
+	user, err := c.userRepoMysql.GetUserByEmail(ctx, email)
+	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func (c *CartUseCase) Checkout(ctx context.Context, products []domain.Product, startAt, finishAt time.Time) error {
-	ctx, cancel := context.WithTimeout(ctx, c.timeOut)
-	defer cancel()
-
-	if err := c.cartRepoMysql.Checkout(ctx,
-		products,
-		startAt,
-		finishAt); err != nil {
+	if err := c.cartRepoMysql.AddProductToCart(ctx,
+		q.Quantity,
+		uint(productID),
+		user.ID); err != nil {
 		return err
 	}
 
