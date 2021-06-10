@@ -15,6 +15,25 @@ func NewUserRepoMysql(db *gorm.DB) domain.UserRepository {
 	return &UserRepoMysql{DB: db}
 }
 
+func (u *UserRepoMysql) CheckVerification(ctx context.Context, email string) (bool, error) {
+	var count int64
+	if err := u.DB.
+		WithContext(ctx).
+		Model(&domain.User{}).
+		Where("users.email = ?", email).
+		Where("users.identity_number IS NOT NULL").
+		Where("users.identity_type IS NOT NULL").
+		Where("users.identity_image IS NOT NULL").
+		Count(&count).Error; err != nil {
+		return false, err
+	}
+	if count <= 0 {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}
+
 func (u *UserRepoMysql) GetUserByEmail(ctx context.Context, email string) (domain.User, error) {
 	var user domain.User
 	result := u.DB.

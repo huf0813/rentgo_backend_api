@@ -33,8 +33,9 @@ type UserSignUpRequest struct {
 }
 
 type UserProfileResponse struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
+	Email      string `json:"email"`
+	Name       string `json:"name"`
+	IsVerified bool   `json:"is_verified"`
 }
 
 type UserRepository interface {
@@ -45,6 +46,7 @@ type UserRepository interface {
 		identityType,
 		identityImage,
 		email string) error
+	CheckVerification(ctx context.Context, email string) (bool, error)
 }
 
 type UserUseCase interface {

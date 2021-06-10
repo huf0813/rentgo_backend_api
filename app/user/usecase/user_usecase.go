@@ -69,9 +69,14 @@ func (u *UserUseCase) Profile(ctx context.Context, email string) (domain.UserPro
 	if err != nil {
 		return domain.UserProfileResponse{}, err
 	}
+	isVerified, err := u.userRepoMysql.CheckVerification(ctx, result.Email)
+	if err != nil {
+		return domain.UserProfileResponse{}, err
+	}
 	res := domain.UserProfileResponse{
-		Email: result.Email,
-		Name:  result.Name,
+		Email:      result.Email,
+		Name:       result.Name,
+		IsVerified: isVerified,
 	}
 
 	return res, nil
