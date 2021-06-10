@@ -27,7 +27,10 @@ type InvoiceRepository interface {
 		startDate, finishDate time.Time,
 		userID uint,
 		cart []Cart) error
-	UpdateOnGoing(ctx context.Context,
+	UpdateInvoiceOnGoing(ctx context.Context,
+		userID uint,
+		receiptCode string) error
+	UpdateInvoiceCompleted(ctx context.Context,
 		userID uint,
 		receiptCode string) error
 }
@@ -37,7 +40,10 @@ type InvoiceUseCase interface {
 		startDate, finishDate time.Time,
 		email string,
 		cartIDS []int) error
-	UpdateOnGoing(ctx context.Context,
+	UpdateInvoiceOnGoing(ctx context.Context,
+		email string,
+		receiptCode string) error
+	UpdateInvoiceCompleted(ctx context.Context,
 		email string,
 		receiptCode string) error
 }

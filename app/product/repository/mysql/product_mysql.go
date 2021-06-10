@@ -19,7 +19,6 @@ func (p *ProductRepository) FetchImagesByID(ctx context.Context, id int) ([]doma
 	if err := p.DB.
 		WithContext(ctx).
 		Model(&domain.Product{}).
-		//Table("products").
 		Select(
 			"product_images.path as path, "+
 				"product_images.id as product_image_id").
@@ -36,7 +35,6 @@ func (p *ProductRepository) FetchReviewsByID(ctx context.Context, id int) ([]dom
 	if err := p.DB.
 		WithContext(ctx).
 		Model(&domain.Product{}).
-		//Table("products").
 		Select(
 			"invoice_products.id as product_review_id, "+
 				"users.name as user_name, "+
@@ -64,8 +62,8 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
-			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products JOIN invoices ON invoice_products.invoice_id = invoices.id WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as star, "+
-			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as reviews,"+
+			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 3) as star, "+
+			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 3) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
@@ -81,14 +79,13 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 	if err := p.DB.
 		WithContext(ctx).
 		Model(&domain.Product{}).
-		//Table("products").
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
-			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products JOIN invoices ON invoice_products.invoice_id = invoices.id WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as star, "+
-			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as reviews,"+
+			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 3) as star, "+
+			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 3) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
@@ -99,19 +96,18 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 	return result, nil
 }
 
-func (p ProductRepository) SearchProduct(ctx context.Context, name string) ([]domain.ProductResponse, error) {
+func (p *ProductRepository) SearchProduct(ctx context.Context, name string) ([]domain.ProductResponse, error) {
 	var result []domain.ProductResponse
 	if err := p.DB.
 		WithContext(ctx).
-		//Table("products").
 		Model(&domain.Product{}).
 		Select("products.name, "+
 			"products.price, "+
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
-			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products JOIN invoices ON invoice_products.invoice_id = invoices.id WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as star, "+
-			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as reviews,"+
+			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 3) as star, "+
+			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 3) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").

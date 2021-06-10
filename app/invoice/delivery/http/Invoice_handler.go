@@ -17,6 +17,35 @@ func NewInvoiceHandler(userGroup *echo.Group, i domain.InvoiceUseCase) {
 	handler := &InvoiceHandler{InvoiceUseCase: i}
 	userGroup.POST("/checkout", handler.Checkout)
 	userGroup.PUT("/on_going/:receipt_number", handler.OnGoing)
+	userGroup.PUT("/completed/:receipt_number", handler.Completed)
+}
+
+func (i *InvoiceHandler) Completed(c echo.Context) error {
+	bearer := c.Request().Header.Get("Authorization")
+	token, err := auth.NewTokenExtraction(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	ctx := c.Request().Context()
+	invoiceID := c.Param("receipt_number")
+	if err := i.InvoiceUseCase.UpdateInvoiceCompleted(ctx,
+		invoiceID,
+		token.Email); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError,
+			custom_response.NewCustomResponse(
+				false,
+				err.Error(),
+				nil))
+	}
+
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"success update invoice to completed",
+		nil))
 }
 
 func (i *InvoiceHandler) Checkout(c echo.Context) error {
@@ -87,7 +116,7 @@ func (i *InvoiceHandler) OnGoing(c echo.Context) error {
 
 	invoiceID := c.Param("receipt_number")
 	ctx := c.Request().Context()
-	if err := i.InvoiceUseCase.UpdateOnGoing(ctx, token.Email, invoiceID); err != nil {
+	if err := i.InvoiceUseCase.UpdateInvoiceOnGoing(ctx, token.Email, invoiceID); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError,
 			custom_response.NewCustomResponse(
 				false,
@@ -97,6 +126,6 @@ func (i *InvoiceHandler) OnGoing(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
 		true,
-		"success update to on going",
+		"success update invoice to on going",
 		nil))
 }

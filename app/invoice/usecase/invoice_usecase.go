@@ -13,6 +13,10 @@ type InvoiceUseCase struct {
 	timeOut          time.Duration
 }
 
+func (i *InvoiceUseCase) UpdateInvoiceCompleted(ctx context.Context, email string, receiptCode string) error {
+	panic("implement me")
+}
+
 func NewInvoiceUseCase(i domain.InvoiceRepository,
 	c domain.CartRepository,
 	u domain.UserRepository,
@@ -64,7 +68,7 @@ func (i *InvoiceUseCase) CreateCheckOut(ctx context.Context,
 	return nil
 }
 
-func (i *InvoiceUseCase) UpdateOnGoing(ctx context.Context,
+func (i *InvoiceUseCase) UpdateInvoiceOnGoing(ctx context.Context,
 	email,
 	receiptCode string) error {
 	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
@@ -77,7 +81,7 @@ func (i *InvoiceUseCase) UpdateOnGoing(ctx context.Context,
 
 	if err := i.
 		invoiceRepoMysql.
-		UpdateOnGoing(ctx,
+		UpdateInvoiceOnGoing(ctx,
 			user.ID,
 			receiptCode); err != nil {
 		return err
