@@ -25,7 +25,7 @@ func (i *InvoiceRepoMysql) CreateCheckOut(ctx context.Context,
 		StartDate:         startDate,
 		FinishDate:        finishDate,
 		UserID:            userID,
-		InvoiceCategoryID: 1,
+		InvoiceCategoryID: 3,
 	}
 	if err := i.DB.
 		WithContext(ctx).
@@ -58,7 +58,7 @@ func (i *InvoiceRepoMysql) UpdateInvoiceOnGoing(ctx context.Context,
 		Joins("JOIN users ON invoices.user_id = users.id").
 		Where("invoices.user_id = ?", userID).
 		Where("invoices.receipt_code = ?", receiptCode).
-		Update("invoices.invoice_category_id", 2).
+		Update("invoices.invoice_category_id", 1).
 		Error; err != nil {
 		return err
 	}
@@ -66,14 +66,16 @@ func (i *InvoiceRepoMysql) UpdateInvoiceOnGoing(ctx context.Context,
 	return nil
 }
 
-func (i *InvoiceRepoMysql) UpdateInvoiceCompleted(ctx context.Context, userID uint, receiptCode string) error {
+func (i *InvoiceRepoMysql) UpdateInvoiceCompleted(ctx context.Context,
+	userID uint,
+	receiptCode string) error {
 	if err := i.DB.
 		Model(&domain.Invoice{}).
 		WithContext(ctx).
 		Joins("JOIN users ON invoices.user_id = users.id").
 		Where("invoices.user_id = ?", userID).
 		Where("invoices.receipt_code = ?", receiptCode).
-		Update("invoices.invoice_category_id", 3).
+		Update("invoices.invoice_category_id", 2).
 		Error; err != nil {
 		return err
 	}
