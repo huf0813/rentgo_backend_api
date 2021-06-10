@@ -21,7 +21,7 @@ func (i *InvoiceRepoMysql) CreateCheckOut(ctx context.Context,
 	userID uint,
 	cart []domain.Cart) error {
 	createInvoice := domain.Invoice{
-		ReceiptNumber:     shortuuid.New(),
+		ReceiptCode:       shortuuid.New(),
 		StartDate:         startDate,
 		FinishDate:        finishDate,
 		UserID:            userID,
@@ -44,6 +44,23 @@ func (i *InvoiceRepoMysql) CreateCheckOut(ctx context.Context,
 			Create(&invoiceProduct).Error; err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (i *InvoiceRepoMysql) UpdateOnGoing(ctx context.Context,
+	userID uint,
+	receiptCode string) error {
+	if err := i.DB.
+		Model(&domain.Invoice{}).
+		WithContext(ctx).
+		Joins("JOIN users ON invoices.user_id = users.id").
+		Where("invoices.user_id = ?", userID).
+		Where("invoices.receipt_code = ?", receiptCode).
+		Update("invoices.invoice_category_id", 2).
+		Error; err != nil {
+		return err
 	}
 
 	return nil

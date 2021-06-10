@@ -63,3 +63,25 @@ func (i *InvoiceUseCase) CreateCheckOut(ctx context.Context,
 
 	return nil
 }
+
+func (i *InvoiceUseCase) UpdateOnGoing(ctx context.Context,
+	email,
+	receiptCode string) error {
+	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
+	defer cancel()
+
+	user, err := i.userRepoMysql.GetUserByEmail(ctx, email)
+	if err != nil {
+		return err
+	}
+
+	if err := i.
+		invoiceRepoMysql.
+		UpdateOnGoing(ctx,
+			user.ID,
+			receiptCode); err != nil {
+		return err
+	}
+
+	return nil
+}

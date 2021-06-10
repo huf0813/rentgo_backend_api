@@ -15,7 +15,7 @@ type UserHandler struct {
 func NewUserHandler(e *echo.Echo, userGroup *echo.Group, u domain.UserUseCase) {
 	handler := &UserHandler{u}
 	userGroup.GET("/profile", handler.Profile)
-	userGroup.POST("/profile/verification", handler.Verification)
+	userGroup.PUT("/profile/verification", handler.Verification)
 
 	authGroup := e.Group("/auth")
 	authGroup.POST("/sign_in", handler.SignIn)

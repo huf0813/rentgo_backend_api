@@ -8,7 +8,7 @@ import (
 
 type Invoice struct {
 	gorm.Model
-	ReceiptNumber     string           `json:"receipt_number"`
+	ReceiptCode       string           `gorm:"unique" json:"receipt_code"`
 	StartDate         time.Time        `json:"start_date"`
 	FinishDate        time.Time        `json:"finish_date"`
 	UserID            uint             `json:"user_id"`
@@ -27,6 +27,9 @@ type InvoiceRepository interface {
 		startDate, finishDate time.Time,
 		userID uint,
 		cart []Cart) error
+	UpdateOnGoing(ctx context.Context,
+		userID uint,
+		receiptCode string) error
 }
 
 type InvoiceUseCase interface {
@@ -34,4 +37,7 @@ type InvoiceUseCase interface {
 		startDate, finishDate time.Time,
 		email string,
 		cartIDS []int) error
+	UpdateOnGoing(ctx context.Context,
+		email string,
+		receiptCode string) error
 }
