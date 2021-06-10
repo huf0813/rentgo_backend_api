@@ -42,3 +42,25 @@ func (u *UserRepoMysql) SignUp(ctx context.Context, name, email, password string
 	}
 	return nil
 }
+
+func (u *UserRepoMysql) UploadVerification(ctx context.Context,
+	identityNumber,
+	identityType,
+	identityImage,
+	email string) error {
+	updateIdentity := domain.User{
+		IdentityNumber: identityNumber,
+		IdentityType:   identityType,
+		IdentityImage:  identityImage,
+	}
+
+	if err := u.DB.
+		WithContext(ctx).
+		Model(&domain.User{}).
+		Where("users.email = ?", email).
+		Updates(&updateIdentity).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

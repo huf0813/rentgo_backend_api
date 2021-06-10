@@ -2,9 +2,12 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"github.com/huf0813/rentgo_backend_api/domain"
 	"github.com/huf0813/rentgo_backend_api/infra/auth"
 	"github.com/huf0813/rentgo_backend_api/utils/custom_security"
+	"github.com/huf0813/rentgo_backend_api/utils/custom_storage"
+	"mime/multipart"
 	"time"
 )
 
@@ -72,4 +75,29 @@ func (u *UserUseCase) Profile(ctx context.Context, email string) (domain.UserPro
 	}
 
 	return res, nil
+}
+
+func (u *UserUseCase) UploadVerification(ctx context.Context,
+	identityNumber,
+	identityType string,
+	identityImage *multipart.FileHeader,
+	email string) error {
+	ctx, cancel := context.WithTimeout(ctx, u.timeOut)
+	defer cancel()
+
+	path := fmt.Sprintf("%s/%s/%s", "assets", "image", "identity")
+	filename, err := custom_storage.NewFileUpload(path, identityImage)
+	if err != nil {
+		return err
+	}
+
+	if err := u.userRepoMysql.UploadVerification(ctx,
+		identityNumber,
+		identityType,
+		filename,
+		email); err != nil {
+		return err
+	}
+
+	return nil
 }

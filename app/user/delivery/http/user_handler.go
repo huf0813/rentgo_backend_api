@@ -15,6 +15,7 @@ type UserHandler struct {
 func NewUserHandler(e *echo.Echo, userGroup *echo.Group, u domain.UserUseCase) {
 	handler := &UserHandler{u}
 	userGroup.GET("/profile", handler.Profile)
+	userGroup.POST("/profile/verification", handler.Verification)
 
 	authGroup := e.Group("/auth")
 	authGroup.POST("/sign_in", handler.SignIn)
@@ -80,5 +81,44 @@ func (u *UserHandler) Profile(c echo.Context) error {
 		true,
 		"get user's profile successfully",
 		result),
+	)
+}
+
+func (u *UserHandler) Verification(c echo.Context) error {
+	ctx := c.Request().Context()
+	authorization := c.Request().Header.Get("Authorization")
+	token, err := auth.NewTokenExtraction(authorization)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	identityType := c.FormValue("identity_type")
+	identityNumber := c.FormValue("identity_number")
+	identityImage, err := c.FormFile("identity_image")
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	if err := u.UserUseCase.UploadVerification(ctx,
+		identityNumber,
+		identityType,
+		identityImage,
+		token.Email); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"upload user's identity successfully",
+		nil),
 	)
 }
