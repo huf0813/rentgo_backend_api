@@ -46,6 +46,7 @@ func (p *ProductRepository) FetchReviewsByID(ctx context.Context, id int) ([]dom
 		Joins("JOIN invoices ON invoice_products.invoice_id = invoices.id").
 		Joins("JOIN users ON invoices.user_id = users.id").
 		Where("products.id = ?", id).
+		Where("invoices.invoice_category_id = ?", 3).
 		Find(&result).Error; err != nil {
 		return nil, err
 	}
@@ -63,8 +64,8 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
-			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products WHERE invoice_products.product_id = products.id) as star, "+
-			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id) as reviews,"+
+			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products JOIN invoices ON invoice_products.invoice_id = invoices.id WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as star, "+
+			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
@@ -86,8 +87,8 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
-			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products WHERE invoice_products.product_id = products.id) as star, "+
-			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id) as reviews,"+
+			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products JOIN invoices ON invoice_products.invoice_id = invoices.id WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as star, "+
+			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
@@ -109,8 +110,8 @@ func (p ProductRepository) SearchProduct(ctx context.Context, name string) ([]do
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
-			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products WHERE invoice_products.product_id = products.id) as star, "+
-			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id) as reviews,"+
+			"(SELECT ROUND(IFNULL(AVG(invoice_products.rating), 0), 1) FROM invoice_products JOIN invoices ON invoice_products.invoice_id = invoices.id WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as star, "+
+			"(SELECT COUNT(*) FROM invoice_products WHERE invoice_products.product_id = products.id AND invoices.invoice_category_id = 3) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
