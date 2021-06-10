@@ -48,14 +48,14 @@ func (c *CartRepoMysql) FetchCart(ctx context.Context, userID uint) ([]domain.Ca
 			"JOIN users vendor on p.user_id = vendor.id "+
 			"where user_cart.id = ?", userID).
 		Rows()
+	if err != nil {
+		return nil, err
+	}
 	defer func() {
 		if err := rows.Close(); err != nil {
 			log.Fatal(err)
 		}
 	}()
-	if err != nil {
-		return nil, err
-	}
 	for rows.Next() {
 		var row domain.CartResponse
 		if err := rows.Scan(&row.ProductName, &row.Vendor, &row.Quantity, &row.ID, &row.ProductPrice); err != nil {

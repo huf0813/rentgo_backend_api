@@ -22,17 +22,35 @@ type InvoiceCheckoutRequest struct {
 	FinishDate string `json:"finish_date"`
 }
 
+type InvoiceResponse struct {
+	StartDate   string `json:"start_date"`
+	FinishDate  string `json:"finish_date"`
+	ReceiptCode string `json:"receipt_code"`
+}
+
+type InvoiceProductResponse struct {
+	ID           int    `json:"invoice_product_id"`
+	Vendor       string `json:"product_vendor"`
+	ProductName  string `json:"product_name"`
+	ProductPrice string `json:"product_price"`
+	Quantity     uint   `json:"product_quantity"`
+}
+
 type InvoiceRepository interface {
 	CreateCheckOut(ctx context.Context,
 		startDate, finishDate time.Time,
 		userID uint,
 		cart []Cart) error
-	UpdateInvoiceOnGoing(ctx context.Context,
+	UpdateInvoiceCategory(ctx context.Context,
 		userID uint,
-		receiptCode string) error
-	UpdateInvoiceCompleted(ctx context.Context,
+		receiptCode string,
+		invoiceCategory int) error
+	GetInvoiceByCategory(ctx context.Context,
 		userID uint,
-		receiptCode string) error
+		invoiceCategory int) ([]InvoiceResponse, error)
+	GetInvoiceProductByReceiptNumber(ctx context.Context,
+		userID uint,
+		receiptNumber string) ([]InvoiceProductResponse, error)
 }
 
 type InvoiceUseCase interface {
@@ -46,4 +64,12 @@ type InvoiceUseCase interface {
 	UpdateInvoiceCompleted(ctx context.Context,
 		email string,
 		receiptCode string) error
+	GetInvoicesAccepted(ctx context.Context,
+		email string) ([]InvoiceResponse, error)
+	GetInvoicesOnGoing(ctx context.Context,
+		email string) ([]InvoiceResponse, error)
+	GetInvoicesCompleted(ctx context.Context,
+		email string) ([]InvoiceResponse, error)
+	GetInvoicesByReceiptCode(ctx context.Context,
+		email, receiptCode string) ([]InvoiceProductResponse, error)
 }

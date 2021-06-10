@@ -25,6 +25,83 @@ func NewInvoiceUseCase(i domain.InvoiceRepository,
 	}
 }
 
+func (i *InvoiceUseCase) GetInvoicesAccepted(ctx context.Context,
+	email string) ([]domain.InvoiceResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
+	defer cancel()
+
+	user, err := i.userRepoMysql.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := i.invoiceRepoMysql.GetInvoiceByCategory(ctx,
+		user.ID, 3)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (i *InvoiceUseCase) GetInvoicesOnGoing(ctx context.Context,
+	email string) ([]domain.InvoiceResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
+	defer cancel()
+
+	user, err := i.userRepoMysql.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := i.invoiceRepoMysql.GetInvoiceByCategory(ctx,
+		user.ID, 1)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (i *InvoiceUseCase) GetInvoicesCompleted(ctx context.Context,
+	email string) ([]domain.InvoiceResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
+	defer cancel()
+
+	user, err := i.userRepoMysql.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := i.invoiceRepoMysql.GetInvoiceByCategory(ctx,
+		user.ID, 2)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (i *InvoiceUseCase) GetInvoicesByReceiptCode(ctx context.Context,
+	email, receiptCode string) ([]domain.InvoiceProductResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
+	defer cancel()
+
+	user, err := i.userRepoMysql.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := i.invoiceRepoMysql.GetInvoiceProductByReceiptNumber(ctx,
+		user.ID,
+		receiptCode)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (i *InvoiceUseCase) CreateCheckOut(ctx context.Context,
 	startDate, finishDate time.Time,
 	email string,
@@ -77,10 +154,11 @@ func (i *InvoiceUseCase) UpdateInvoiceOnGoing(ctx context.Context,
 
 	if err := i.
 		invoiceRepoMysql.
-		UpdateInvoiceOnGoing(
+		UpdateInvoiceCategory(
 			ctx,
 			user.ID,
-			receiptCode); err != nil {
+			receiptCode,
+			1); err != nil {
 		return err
 	}
 
@@ -100,10 +178,11 @@ func (i *InvoiceUseCase) UpdateInvoiceCompleted(ctx context.Context,
 
 	if err := i.
 		invoiceRepoMysql.
-		UpdateInvoiceCompleted(
+		UpdateInvoiceCategory(
 			ctx,
 			user.ID,
-			receiptCode); err != nil {
+			receiptCode,
+			2); err != nil {
 		return err
 	}
 

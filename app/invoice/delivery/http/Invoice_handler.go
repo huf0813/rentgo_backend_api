@@ -18,6 +18,113 @@ func NewInvoiceHandler(userGroup *echo.Group, i domain.InvoiceUseCase) {
 	userGroup.POST("/checkout", handler.Checkout)
 	userGroup.PUT("/on_going/:receipt_number", handler.OnGoing)
 	userGroup.PUT("/completed/:receipt_number", handler.Completed)
+	userGroup.GET("/invoice/accepted", handler.GetInvoicesAccepted)
+	userGroup.GET("/invoice/on_going", handler.GetInvoicesOnGoing)
+	userGroup.GET("/invoice/completed", handler.GetInvoicesCompleted)
+	userGroup.GET("/invoice/product/:receipt_code", handler.GetInvoiceProducts)
+}
+
+func (i *InvoiceHandler) GetInvoiceProducts(c echo.Context) error {
+	bearer := c.Request().Header.Get("Authorization")
+	token, err := auth.NewTokenExtraction(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	receiptCode := c.Param("receipt_code")
+	ctx := c.Request().Context()
+	res, err := i.InvoiceUseCase.GetInvoicesByReceiptCode(ctx,
+		token.Email,
+		receiptCode)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"get invoice products successfully",
+		res))
+}
+
+func (i *InvoiceHandler) GetInvoicesAccepted(c echo.Context) error {
+	bearer := c.Request().Header.Get("Authorization")
+	token, err := auth.NewTokenExtraction(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	ctx := c.Request().Context()
+	res, err := i.InvoiceUseCase.GetInvoicesAccepted(ctx, token.Email)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"get invoices accepted successfully",
+		res))
+}
+
+func (i *InvoiceHandler) GetInvoicesOnGoing(c echo.Context) error {
+	bearer := c.Request().Header.Get("Authorization")
+	token, err := auth.NewTokenExtraction(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	ctx := c.Request().Context()
+	res, err := i.InvoiceUseCase.GetInvoicesOnGoing(ctx, token.Email)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"get invoices on going successfully",
+		res))
+}
+
+func (i *InvoiceHandler) GetInvoicesCompleted(c echo.Context) error {
+	bearer := c.Request().Header.Get("Authorization")
+	token, err := auth.NewTokenExtraction(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	ctx := c.Request().Context()
+	res, err := i.InvoiceUseCase.GetInvoicesCompleted(ctx, token.Email)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		true,
+		"get invoices completed successfully",
+		res))
 }
 
 func (i *InvoiceHandler) Checkout(c echo.Context) error {
