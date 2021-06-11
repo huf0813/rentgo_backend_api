@@ -116,16 +116,17 @@ func (i *InvoiceUseCase) CreateCheckOut(ctx context.Context,
 	}
 
 	var invoiceProducts []domain.Cart
-	for _, v := range cartIDS {
+	for k := 0; k < len(cartIDS); k++ {
 		res, err := i.cartRepoMysql.FetchCartByID(ctx,
-			uint(v),
-			user.ID)
+			user.ID,
+			uint(cartIDS[k]))
 		if err != nil {
 			return err
 		}
 		invoiceProducts = append(invoiceProducts, res)
 		if err := i.cartRepoMysql.DeleteCartByID(ctx,
-			user.ID, uint(v)); err != nil {
+			user.ID,
+			uint(cartIDS[k])); err != nil {
 			return err
 		}
 	}
