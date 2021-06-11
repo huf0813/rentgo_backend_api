@@ -19,94 +19,6 @@ func NewMigrationRepoMysql(db *gorm.DB) domain.MigrationRepository {
 	return &MigrationRepoMysql{DB: db}
 }
 
-func (m *MigrationRepoMysql) Migrate(ctx context.Context) error {
-	// layer one
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.User{}); err != nil {
-		return err
-	}
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.ProductCategory{}); err != nil {
-		return err
-	}
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.EventCategory{}); err != nil {
-		return err
-	}
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.InvoiceCategory{}); err != nil {
-		return err
-	}
-
-	// layer two
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.Product{}); err != nil {
-		return err
-	}
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.Event{}); err != nil {
-		return err
-	}
-
-	// layer three
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.ProductImage{}); err != nil {
-		return err
-	}
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.EventProduct{}); err != nil {
-		return err
-	}
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.Invoice{}); err != nil {
-		return err
-	}
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.Cart{}); err != nil {
-		return err
-	}
-
-	// layer four
-	if err := m.DB.
-		WithContext(ctx).
-		Set("gorm:table_options", "ENGINE=InnoDB").
-		Migrator().
-		CreateTable(&domain.InvoiceProduct{}); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (m *MigrationRepoMysql) Drop(ctx context.Context) error {
 	// layer four
 	if err := m.DB.
@@ -195,6 +107,94 @@ func (m *MigrationRepoMysql) Drop(ctx context.Context) error {
 	return nil
 }
 
+func (m *MigrationRepoMysql) Migrate(ctx context.Context) error {
+	// layer one
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.User{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.ProductCategory{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.EventCategory{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.InvoiceCategory{}); err != nil {
+		return err
+	}
+
+	// layer two
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Product{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Event{}); err != nil {
+		return err
+	}
+
+	// layer three
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.ProductImage{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.EventProduct{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Invoice{}); err != nil {
+		return err
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.Cart{}); err != nil {
+		return err
+	}
+
+	// layer four
+	if err := m.DB.
+		WithContext(ctx).
+		Set("gorm:table_options", "ENGINE=InnoDB").
+		Migrator().
+		CreateTable(&domain.InvoiceProduct{}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (m *MigrationRepoMysql) Seed(ctx context.Context) error {
 	if err := m.DB.
 		WithContext(ctx).
@@ -258,6 +258,7 @@ func (m *MigrationRepoMysql) Faker(ctx context.Context) error {
 		// product
 		newProduct := domain.Product{
 			Name:              faker.FirstName(),
+			Overview:          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 			Price:             uint(rand.Intn(500000-10000) + 10000),
 			Stock:             uint(rand.Intn(50-10) + 10),
 			ProductCategoryID: uint(rand.Intn(3-1) + 1),

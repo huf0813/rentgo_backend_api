@@ -14,29 +14,6 @@ func NewProductRepository(db *gorm.DB) domain.ProductRepository {
 	return &ProductRepository{DB: db}
 }
 
-func (p *ProductRepository) FetchLatestProduct(ctx context.Context) ([]domain.ProductResponse, error) {
-	var result []domain.ProductResponse
-	if err := p.DB.
-		WithContext(ctx).
-		Model(&domain.Product{}).
-		Select("products.name, " +
-			"products.price, " +
-			"products.stock, " +
-			"products.id, " +
-			"users.name as vendor, " +
-			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as star, " +
-			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as reviews," +
-			"product_categories.name as product_category").
-		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
-		Joins("JOIN users ON products.user_id = users.id").
-		Order("products.created_at").
-		Limit(5).
-		Find(&result).Error; err != nil {
-		return nil, err
-	}
-	return result, nil
-}
-
 func (p *ProductRepository) FetchImagesByID(ctx context.Context, id int) ([]domain.ProductImageResponse, error) {
 	var result []domain.ProductImageResponse
 	if err := p.DB.
@@ -74,6 +51,30 @@ func (p *ProductRepository) FetchReviewsByID(ctx context.Context, id int) ([]dom
 	return result, nil
 }
 
+func (p *ProductRepository) FetchLatestProduct(ctx context.Context) ([]domain.ProductResponse, error) {
+	var result []domain.ProductResponse
+	if err := p.DB.
+		WithContext(ctx).
+		Model(&domain.Product{}).
+		Select("products.name, " +
+			"products.price, " +
+			"products.overview, " +
+			"products.stock, " +
+			"products.id, " +
+			"users.name as vendor, " +
+			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as star, " +
+			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as reviews," +
+			"product_categories.name as product_category").
+		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
+		Joins("JOIN users ON products.user_id = users.id").
+		Order("products.created_at").
+		Limit(5).
+		Find(&result).Error; err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
 func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.ProductResponse, error) {
 	var product domain.ProductResponse
 	if err := p.DB.
@@ -81,6 +82,7 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 		Model(&domain.Product{}).
 		Select("products.name, "+
 			"products.price, "+
+			"products.overview, "+
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
@@ -103,6 +105,7 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 		Model(&domain.Product{}).
 		Select("products.name, "+
 			"products.price, "+
+			"products.overview, "+
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+
@@ -125,6 +128,7 @@ func (p *ProductRepository) SearchProduct(ctx context.Context, name string) ([]d
 		Model(&domain.Product{}).
 		Select("products.name, "+
 			"products.price, "+
+			"products.overview, "+
 			"products.stock, "+
 			"products.id, "+
 			"users.name as vendor, "+

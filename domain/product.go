@@ -8,6 +8,7 @@ import (
 type Product struct {
 	gorm.Model
 	Name              string           `gorm:"not null" json:"name"`
+	Overview          string           `gorm:"not null" json:"overview"`
 	Price             uint             `gorm:"not null" json:"price"`
 	Stock             uint             `gorm:"not null" json:"stock"`
 	ProductCategoryID uint             `json:"product_category_id"`
@@ -21,6 +22,7 @@ type Product struct {
 type ProductResponse struct {
 	ID              uint    `json:"id"`
 	Name            string  `json:"name"`
+	Overview        string  `json:"overview"`
 	Price           uint    `json:"price"`
 	Stock           uint    `json:"stock"`
 	Star            float64 `json:"star"`
