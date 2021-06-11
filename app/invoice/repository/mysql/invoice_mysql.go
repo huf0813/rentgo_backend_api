@@ -41,7 +41,7 @@ func (i *InvoiceRepoMysql) GetInvoiceByCategory(ctx context.Context,
 	invoiceCategory int) ([]domain.InvoiceResponse, error) {
 	var res []domain.InvoiceResponse
 
-	query := fmt.Sprintf("SELECT i.receipt_code as receipt_code, i.start_date as start_date, i.finish_date as finish_date FROM invoices i JOIN invoice_products ip ON ip.invoice_id = i.id WHERE i.user_id = %d AND i.invoice_category_id = %d", userID, invoiceCategory)
+	query := fmt.Sprintf("SELECT i.receipt_code as receipt_code, i.start_date as start_date, i.finish_date as finish_date FROM invoices i WHERE i.user_id = %d AND i.invoice_category_id = %d", userID, invoiceCategory)
 	rows, err :=
 		i.DB.WithContext(ctx).
 			Raw(query).
