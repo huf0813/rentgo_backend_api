@@ -19,6 +19,23 @@ func NewInvoiceRepoMysql(db *gorm.DB) domain.InvoiceRepository {
 	return &InvoiceRepoMysql{DB: db}
 }
 
+func (i *InvoiceRepoMysql) CreateReviewByInvoiceProductID(ctx context.Context,
+	invoiceProductID, star uint,
+	review string) error {
+	updateReview := domain.InvoiceProduct{
+		Rating: star,
+		Review: review,
+	}
+	if err := i.DB.
+		WithContext(ctx).
+		Where("invoice_products.id = ?", invoiceProductID).
+		Updates(&updateReview).
+		Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (i *InvoiceRepoMysql) GetInvoiceByCategory(ctx context.Context,
 	userID uint,
 	invoiceCategory int) ([]domain.InvoiceResponse, error) {
@@ -94,6 +111,86 @@ func (i *InvoiceRepoMysql) GetInvoiceProductByReceiptNumber(ctx context.Context,
 	}
 
 	return res, nil
+}
+
+func (i *InvoiceRepoMysql) GetCompletedInvoiceProductByReceiptNumber(ctx context.Context,
+	userID uint,
+	receiptCode string) ([]domain.CompletedInvoiceProductResponse,
+	error) {
+	var res []domain.CompletedInvoiceProductResponse
+
+	rows, err := i.DB.WithContext(ctx).
+		Raw("select p.name as product_name, "+
+			"vendor.name as product_vendor, "+
+			"ip.quantity as product_quantity, "+
+			"ip.id as invoice_product_id, "+
+			"p.price as product_price from products p "+
+			"JOIN invoice_products ip on ip.product_id = p.id "+
+			"JOIN invoices i on i.id = ip.invoice_id "+
+			"JOIN users user_invoice on user_invoice.id = i.user_id "+
+			"JOIN users vendor on vendor.id = p.user_id "+
+			"where i.receipt_code = ? "+
+			"AND user_invoice.id = ? "+
+			"AND i.invoice_category_id = ?",
+			receiptCode,
+			userID,
+			2).
+		Rows()
+	if err != nil {
+		return nil, err
+	}
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(rows)
+
+	for rows.Next() {
+		var row domain.CompletedInvoiceProductResponse
+		if err := rows.Scan(&row.ProductName,
+			&row.Vendor,
+			&row.Quantity,
+			&row.ID,
+			&row.ProductPrice); err != nil {
+			return nil, err
+		}
+
+		row.IsReviewed, err = i.IsCompletedInvoiceProductByReceiptNumberReviewed(
+			ctx,
+			userID,
+			row.ID,
+			receiptCode)
+
+		res = append(res, row)
+	}
+
+	return res, nil
+}
+
+func (i *InvoiceRepoMysql) IsCompletedInvoiceProductByReceiptNumberReviewed(ctx context.Context,
+	userID uint,
+	invoiceProductID int,
+	receiptCode string) (bool,
+	error) {
+	var count int64
+	if err := i.DB.
+		WithContext(ctx).
+		Model(&domain.InvoiceProduct{}).
+		Joins("JOIN invoices ON invoices.id = invoice_products.invoice_id").
+		Where("invoice_products.id = ?", invoiceProductID).
+		Where("invoices.receipt_code = ?", receiptCode).
+		Where("invoices.user_id = ?", userID).
+		Where("invoice_products.rating IS NOT NULL").
+		Where("invoice_products.review IS NOT NULL").
+		Count(&count).Error; err != nil {
+		return false, err
+	}
+	if count <= 0 {
+		return false, nil
+	} else {
+		return true, nil
+	}
 }
 
 func (i *InvoiceRepoMysql) CreateCheckOut(ctx context.Context,

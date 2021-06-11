@@ -33,7 +33,8 @@ func (u *UserHandler) SignIn(c echo.Context) error {
 	ctx := c.Request().Context()
 	result, err := u.UserUseCase.SignIn(ctx, user.Email, user.Password)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.
+			NewCustomResponse(false, err.Error(), nil))
 	}
 	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
 		true,
@@ -55,7 +56,8 @@ func (u *UserHandler) SignUp(c echo.Context) error {
 		user.Name,
 		user.Email,
 		user.Password); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.
+			NewCustomResponse(false, err.Error(), nil))
 	}
 	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(
 		true,

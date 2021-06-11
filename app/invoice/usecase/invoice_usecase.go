@@ -25,6 +25,20 @@ func NewInvoiceUseCase(i domain.InvoiceRepository,
 	}
 }
 
+func (i *InvoiceUseCase) CreateReviewByInvoiceProductID(ctx context.Context,
+	invoiceProductID, star uint,
+	review string) error {
+	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
+	defer cancel()
+
+	if err := i.invoiceRepoMysql.CreateReviewByInvoiceProductID(ctx,
+		invoiceProductID, star, review); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (i *InvoiceUseCase) GetInvoicesAccepted(ctx context.Context,
 	email string) ([]domain.InvoiceResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
@@ -82,8 +96,9 @@ func (i *InvoiceUseCase) GetInvoicesCompleted(ctx context.Context,
 	return res, nil
 }
 
-func (i *InvoiceUseCase) GetInvoicesByReceiptCode(ctx context.Context,
-	email, receiptCode string) ([]domain.InvoiceProductResponse, error) {
+func (i *InvoiceUseCase) GetInvoiceProductsByReceiptCode(ctx context.Context,
+	email, receiptCode string) ([]domain.InvoiceProductResponse,
+	error) {
 	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
 	defer cancel()
 
@@ -188,4 +203,23 @@ func (i *InvoiceUseCase) UpdateInvoiceCompleted(ctx context.Context,
 	}
 
 	return nil
+}
+
+func (i *InvoiceUseCase) GetCompletedInvoiceProductsByReceiptCode(ctx context.Context,
+	email string,
+	receiptCode string) ([]domain.CompletedInvoiceProductResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
+	defer cancel()
+
+	user, err := i.userRepoMysql.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := i.invoiceRepoMysql.GetCompletedInvoiceProductByReceiptNumber(
+		ctx,
+		user.ID,
+		receiptCode)
+
+	return res, nil
 }

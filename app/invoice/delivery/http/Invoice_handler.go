@@ -7,6 +7,7 @@ import (
 	"github.com/huf0813/rentgo_backend_api/utils/custom_response"
 	"github.com/labstack/echo/v4"
 	"net/http"
+	"strconv"
 )
 
 type InvoiceHandler struct {
@@ -15,13 +16,90 @@ type InvoiceHandler struct {
 
 func NewInvoiceHandler(userGroup *echo.Group, i domain.InvoiceUseCase) {
 	handler := &InvoiceHandler{InvoiceUseCase: i}
-	userGroup.POST("/checkout", handler.Checkout)
-	userGroup.PUT("/on_going/:receipt_number", handler.OnGoing)
-	userGroup.PUT("/completed/:receipt_number", handler.Completed)
-	userGroup.GET("/invoice/accepted", handler.GetInvoicesAccepted)
-	userGroup.GET("/invoice/on_going", handler.GetInvoicesOnGoing)
-	userGroup.GET("/invoice/completed", handler.GetInvoicesCompleted)
-	userGroup.GET("/invoice/product/:receipt_code", handler.GetInvoiceProducts)
+	userGroup.POST("/checkout",
+		handler.Checkout)
+	userGroup.PUT("/on_going/:receipt_number",
+		handler.OnGoing)
+	userGroup.PUT("/completed/:receipt_number",
+		handler.Completed)
+	userGroup.PUT("/review/create/:invoice_product_id",
+		handler.CreateReviewByInvoiceProductID)
+	userGroup.GET("/invoice/accepted",
+		handler.GetInvoicesAccepted)
+	userGroup.GET("/invoice/on_going",
+		handler.GetInvoicesOnGoing)
+	userGroup.GET("/invoice/product/:receipt_code",
+		handler.GetInvoiceProducts)
+	userGroup.GET("/invoice/completed",
+		handler.GetInvoicesCompleted)
+	userGroup.GET("/invoice/completed/product/:receipt_code",
+		handler.GetCompletedInvoiceProducts)
+}
+
+func (i *InvoiceHandler) CreateReviewByInvoiceProductID(c echo.Context) error {
+	createReview := new(domain.InvoiceReviewRequest)
+	if err := c.Bind(createReview); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	if err := c.Validate(createReview); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	ctx := c.Request().Context()
+	invoiceProductID := c.Param("invoice_product_id")
+	invoiceProductIDInteger, err := strconv.Atoi(invoiceProductID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest,
+			custom_response.NewCustomResponse(
+				false,
+				err.Error(),
+				nil))
+	}
+
+	if err := i.InvoiceUseCase.CreateReviewByInvoiceProductID(ctx,
+		uint(invoiceProductIDInteger),
+		createReview.Rating,
+		createReview.Review); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError,
+			custom_response.NewCustomResponse(
+				false,
+				err.Error(),
+				nil))
+	}
+
+	return c.JSON(http.StatusOK,
+		custom_response.NewCustomResponse(
+			false,
+			"create review successfully",
+			nil))
+}
+
+func (i *InvoiceHandler) GetCompletedInvoiceProducts(c echo.Context) error {
+	bearer := c.Request().Header.Get("Authorization")
+	token, err := auth.NewTokenExtraction(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	receiptCode := c.Param("receipt_code")
+	ctx := c.Request().Context()
+	res, err := i.InvoiceUseCase.GetCompletedInvoiceProductsByReceiptCode(ctx,
+		token.Email,
+		receiptCode)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError,
+			custom_response.NewCustomResponse(
+				false,
+				err.Error(),
+				nil))
+	}
+
+	return c.JSON(http.StatusOK, custom_response.NewCustomResponse(true,
+		"fetch completed product successfully",
+		res))
 }
 
 func (i *InvoiceHandler) GetInvoiceProducts(c echo.Context) error {
@@ -36,7 +114,7 @@ func (i *InvoiceHandler) GetInvoiceProducts(c echo.Context) error {
 
 	receiptCode := c.Param("receipt_code")
 	ctx := c.Request().Context()
-	res, err := i.InvoiceUseCase.GetInvoicesByReceiptCode(ctx,
+	res, err := i.InvoiceUseCase.GetInvoiceProductsByReceiptCode(ctx,
 		token.Email,
 		receiptCode)
 	if err != nil {
@@ -113,7 +191,8 @@ func (i *InvoiceHandler) GetInvoicesCompleted(c echo.Context) error {
 	}
 
 	ctx := c.Request().Context()
-	res, err := i.InvoiceUseCase.GetInvoicesCompleted(ctx, token.Email)
+	res, err := i.InvoiceUseCase.GetInvoicesCompleted(ctx,
+		token.Email)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
 			false,

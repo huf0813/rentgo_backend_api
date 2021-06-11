@@ -7,6 +7,6 @@ type InvoiceProduct struct {
 	ProductID uint   `json:"product_id"`
 	InvoiceID uint   `json:"invoice_id"`
 	Quantity  uint   `json:"quantity"`
-	Rating    uint   `json:"rating"`
-	Review    string `json:"review"`
+	Rating    uint   `gorm:"default:null" json:"rating"`
+	Review    string `gorm:"default:null" json:"review"`
 }
