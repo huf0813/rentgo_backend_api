@@ -50,6 +50,7 @@ type ProductRepository interface {
 	FetchReviewsByID(ctx context.Context, id int) ([]ProductReviewResponse, error)
 	FetchImagesByID(ctx context.Context, id int) ([]ProductImageResponse, error)
 	FetchLatestProduct(ctx context.Context) ([]ProductResponse, error)
+	FetchTrendingProduct(ctx context.Context) ([]ProductResponse, error)
 }
 type ProductUseCase interface {
 	FetchByID(ctx context.Context, id int) (ProductResponse, error)
@@ -58,4 +59,5 @@ type ProductUseCase interface {
 	FetchReviewsByID(ctx context.Context, id int) ([]ProductReviewResponse, error)
 	FetchImagesByID(ctx context.Context, id int) ([]ProductImageResponse, error)
 	FetchLatestProduct(ctx context.Context) ([]ProductResponse, error)
+	FetchTrendingProduct(ctx context.Context) ([]ProductResponse, error)
 }

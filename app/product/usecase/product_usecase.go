@@ -18,6 +18,18 @@ func NewProductUseCase(p domain.ProductRepository, timeOut time.Duration) domain
 	}
 }
 
+func (p *ProductUseCase) FetchTrendingProduct(ctx context.Context) ([]domain.ProductResponse, error) {
+	ctx, cancel := context.WithTimeout(ctx, p.timeOut)
+	defer cancel()
+
+	res, err := p.productRepoMysql.FetchTrendingProduct(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (p *ProductUseCase) FetchLatestProduct(ctx context.Context) ([]domain.ProductResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, p.timeOut)
 	defer cancel()

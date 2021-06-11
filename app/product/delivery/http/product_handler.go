@@ -16,10 +16,29 @@ func NewProductHandler(e *echo.Echo, p domain.ProductUseCase) {
 	handler := &ProductHandler{ProductUseCase: p}
 	e.GET("/product", handler.SearchProduct)
 	e.GET("/product/latest", handler.FetchProductLatest)
+	e.GET("/product/trending", handler.FetchProductTrending)
 	e.GET("/product/detail/:id", handler.FetchByID)
 	e.GET("/product/detail/:id/reviews", handler.FetchReviewsByID)
 	e.GET("/product/detail/:id/images", handler.FetchImagesByID)
 	e.GET("/product/category/:category", handler.FetchByCategory)
+}
+
+func (p *ProductHandler) FetchProductTrending(c echo.Context) error {
+	ctx := c.Request().Context()
+	res, err := p.ProductUseCase.FetchTrendingProduct(ctx)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError,
+			custom_response.NewCustomResponse(
+				false,
+				err.Error(),
+				res))
+	}
+
+	return c.JSON(http.StatusOK,
+		custom_response.NewCustomResponse(
+			true,
+			"get trending product successfully",
+			res))
 }
 
 func (p *ProductHandler) FetchProductLatest(c echo.Context) error {
