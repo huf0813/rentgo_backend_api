@@ -9,6 +9,6 @@ type ProductCategory struct {
 }
 
 type ProductCategoryResponse struct {
-	ProductCategoryID uint   `json:"product_category_id"`
-	Name              string `json:"product_category_name"`
+	ProductCategoryID   uint   `json:"product_category_id"`
+	ProductCategoryName string `json:"product_category_name"`
 }
