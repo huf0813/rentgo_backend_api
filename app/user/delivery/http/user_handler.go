@@ -97,6 +97,8 @@ func (u *UserHandler) Verification(c echo.Context) error {
 			nil))
 	}
 
+	storePhone := c.FormValue("store_phone")
+	storeName := c.FormValue("store_name")
 	identityType := c.FormValue("identity_type")
 	identityNumber := c.FormValue("identity_number")
 	identityImage, err := c.FormFile("identity_image")
@@ -111,6 +113,8 @@ func (u *UserHandler) Verification(c echo.Context) error {
 		identityNumber,
 		identityType,
 		identityImage,
+		storeName,
+		storePhone,
 		token.Email); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
 			false,

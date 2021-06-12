@@ -66,11 +66,15 @@ func (u *UserRepoMysql) UploadVerification(ctx context.Context,
 	identityNumber,
 	identityType,
 	identityImage,
+	storeName,
+	storePhone,
 	email string) error {
 	updateIdentity := domain.User{
 		IdentityNumber: identityNumber,
 		IdentityType:   identityType,
 		IdentityImage:  identityImage,
+		StoreName:      storeName,
+		Phone:          storePhone,
 	}
 
 	if err := u.DB.

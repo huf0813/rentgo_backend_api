@@ -12,6 +12,7 @@ type User struct {
 	Email          string    `gorm:"unique;not null" json:"email"`
 	Password       string    `gorm:"not null" json:"password"`
 	Phone          string    `gorm:"unique;default:null" json:"phone"`
+	StoreName      string    `gorm:"unique;default:null" json:"store_name"`
 	IdentityNumber string    `gorm:"unique;default:null" json:"identity_number"`
 	IdentityType   string    `gorm:"unique;default:null" json:"identity_type"`
 	IdentityImage  string    `gorm:"unique;default:null" json:"identity_image"`
@@ -45,6 +46,8 @@ type UserRepository interface {
 		identityNumber,
 		identityType,
 		identityImage,
+		StoreName,
+		StorePhone,
 		email string) error
 	CheckVerification(ctx context.Context, email string) (bool, error)
 }
@@ -57,5 +60,7 @@ type UserUseCase interface {
 		identityNumber,
 		identityType string,
 		identityImage *multipart.FileHeader,
+		StoreName,
+		StorePhone,
 		email string) error
 }

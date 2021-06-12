@@ -86,6 +86,8 @@ func (u *UserUseCase) UploadVerification(ctx context.Context,
 	identityNumber,
 	identityType string,
 	identityImage *multipart.FileHeader,
+	storeName,
+	storePhone,
 	email string) error {
 	ctx, cancel := context.WithTimeout(ctx, u.timeOut)
 	defer cancel()
@@ -100,6 +102,8 @@ func (u *UserUseCase) UploadVerification(ctx context.Context,
 		identityNumber,
 		identityType,
 		filename,
+		storeName,
+		storePhone,
 		email); err != nil {
 		return err
 	}
