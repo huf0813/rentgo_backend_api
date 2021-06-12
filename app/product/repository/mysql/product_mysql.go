@@ -48,8 +48,14 @@ func (p *ProductRepository) FetchImagesByID(ctx context.Context, id int) ([]doma
 		Select(
 			"product_images.id, "+
 				"product_images.path").
-		Joins("JOIN product_images ON products.id = product_images.product_id").
-		Where("products.id = ?", id).
+		Joins("JOIN users ON users.id = products.user_id").
+		Joins("RIGHT JOIN product_images ON products.id = product_images.product_id").
+		Where("product_images.product_id = ?", id).
+		Where("users.identity_image IS NOT NULL").
+		Where("users.identity_type IS NOT NULL").
+		Where("users.identity_number IS NOT NULL").
+		Where("users.store_name IS NOT NULL").
+		Where("users.phone IS NOT NULL").
 		Find(&result).Error; err != nil {
 		return nil, err
 	}
@@ -71,6 +77,11 @@ func (p *ProductRepository) FetchReviewsByID(ctx context.Context, id int) ([]dom
 		Joins("JOIN users ON invoices.user_id = users.id").
 		Where("products.id = ?", id).
 		Where("invoices.invoice_category_id = ?", 2).
+		Where("users.identity_image IS NOT NULL").
+		Where("users.identity_type IS NOT NULL").
+		Where("users.identity_number IS NOT NULL").
+		Where("users.store_name IS NOT NULL").
+		Where("users.phone IS NOT NULL").
 		Find(&result).Error; err != nil {
 		return nil, err
 	}
@@ -87,12 +98,17 @@ func (p *ProductRepository) FetchLatestProduct(ctx context.Context) ([]domain.Pr
 			"products.overview, " +
 			"products.stock, " +
 			"products.id, " +
-			"users.name as vendor, " +
+			"users.store_name as vendor, " +
 			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as star, " +
 			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as reviews," +
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
+		Where("users.identity_image IS NOT NULL").
+		Where("users.identity_type IS NOT NULL").
+		Where("users.identity_number IS NOT NULL").
+		Where("users.store_name IS NOT NULL").
+		Where("users.phone IS NOT NULL").
 		Order("products.created_at").
 		Limit(5).
 		Find(&result).Error; err != nil {
@@ -111,12 +127,17 @@ func (p *ProductRepository) FetchTrendingProduct(ctx context.Context) ([]domain.
 			"products.overview, " +
 			"products.stock, " +
 			"products.id, " +
-			"users.name as vendor, " +
+			"users.store_name as vendor, " +
 			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as star, " +
 			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as reviews," +
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
+		Where("users.identity_image IS NOT NULL").
+		Where("users.identity_type IS NOT NULL").
+		Where("users.identity_number IS NOT NULL").
+		Where("users.store_name IS NOT NULL").
+		Where("users.phone IS NOT NULL").
 		Order("star desc").
 		Order("reviews desc").
 		Limit(5).
@@ -136,13 +157,18 @@ func (p *ProductRepository) FetchByID(ctx context.Context, id int) (domain.Produ
 			"products.overview, "+
 			"products.stock, "+
 			"products.id, "+
-			"users.name as vendor, "+
+			"users.store_name as vendor, "+
 			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as star, "+
 			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
 		Where("products.id = ?", id).
+		Where("users.identity_image IS NOT NULL").
+		Where("users.identity_type IS NOT NULL").
+		Where("users.identity_number IS NOT NULL").
+		Where("users.store_name IS NOT NULL").
+		Where("users.phone IS NOT NULL").
 		First(&product).Error; err != nil {
 		return domain.ProductResponse{}, err
 	}
@@ -159,13 +185,18 @@ func (p *ProductRepository) FetchByCategory(ctx context.Context, category string
 			"products.overview, "+
 			"products.stock, "+
 			"products.id, "+
-			"users.name as vendor, "+
+			"users.store_name as vendor, "+
 			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as star, "+
 			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
 		Where("product_categories.name LIKE ?", category+"%").
+		Where("users.identity_image IS NOT NULL").
+		Where("users.identity_type IS NOT NULL").
+		Where("users.identity_number IS NOT NULL").
+		Where("users.store_name IS NOT NULL").
+		Where("users.phone IS NOT NULL").
 		Find(&result).Error; err != nil {
 		return nil, err
 	}
@@ -182,13 +213,18 @@ func (p *ProductRepository) SearchProduct(ctx context.Context, name string) ([]d
 			"products.overview, "+
 			"products.stock, "+
 			"products.id, "+
-			"users.name as vendor, "+
+			"users.store_name as vendor, "+
 			"(SELECT ROUND(IFNULL(AVG(ip.rating), 0), 1) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as star, "+
 			"(SELECT COUNT(*) FROM invoice_products ip JOIN invoices i ON ip.invoice_id = i.id WHERE ip.product_id = products.id AND i.invoice_category_id = 2) as reviews,"+
 			"product_categories.name as product_category").
 		Joins("JOIN product_categories ON products.product_category_id = product_categories.id").
 		Joins("JOIN users ON products.user_id = users.id").
 		Where("products.name LIKE ?", name+"%").
+		Where("users.identity_image IS NOT NULL").
+		Where("users.identity_type IS NOT NULL").
+		Where("users.identity_number IS NOT NULL").
+		Where("users.store_name IS NOT NULL").
+		Where("users.phone IS NOT NULL").
 		Find(&result).Error; err != nil {
 		return nil, err
 	}

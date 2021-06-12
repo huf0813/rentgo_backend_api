@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"github.com/huf0813/rentgo_backend_api/domain"
 	"time"
 )
@@ -120,7 +121,7 @@ func (i *InvoiceUseCase) GetInvoiceProductsByReceiptCode(ctx context.Context,
 func (i *InvoiceUseCase) CreateCheckOut(ctx context.Context,
 	startDate, finishDate time.Time,
 	email string,
-	cartIDS []int) error {
+	cartIDS []uint) error {
 	ctx, cancel := context.WithTimeout(ctx, i.timeOut)
 	defer cancel()
 
@@ -130,18 +131,27 @@ func (i *InvoiceUseCase) CreateCheckOut(ctx context.Context,
 		return err
 	}
 
+	isCartIDsValid, err := i.cartRepoMysql.IsCartByIDsExist(ctx,
+		user.ID, cartIDS)
+	if err != nil {
+		return err
+	}
+	if !isCartIDsValid {
+		return errors.New("one of cart_ids is invalid")
+	}
+
 	var invoiceProducts []domain.Cart
 	for k := 0; k < len(cartIDS); k++ {
 		res, err := i.cartRepoMysql.FetchCartByID(ctx,
 			user.ID,
-			uint(cartIDS[k]))
+			cartIDS[k])
 		if err != nil {
 			return err
 		}
 		invoiceProducts = append(invoiceProducts, res)
 		if err := i.cartRepoMysql.DeleteCartByID(ctx,
 			user.ID,
-			uint(cartIDS[k])); err != nil {
+			cartIDS[k]); err != nil {
 			return err
 		}
 	}

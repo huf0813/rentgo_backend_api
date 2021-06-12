@@ -34,6 +34,7 @@ type CartRepository interface {
 	FetchCartByID(ctx context.Context,
 		userID, cartID uint) (Cart, error)
 	DeleteCartByID(ctx context.Context, userID, cartID uint) error
+	IsCartByIDsExist(ctx context.Context, userID uint, cartIDs []uint) (bool, error)
 }
 
 type CartUseCase interface {

@@ -235,51 +235,47 @@ func (m *MigrationRepoMysql) Seed(ctx context.Context) error {
 
 func (m *MigrationRepoMysql) Faker(ctx context.Context) error {
 	/* user */
-	for i := 1; i <= 10; i++ {
-		password, err := custom_security.NewHashingValue("1234567890")
-		if err != nil {
-			return err
-		}
-		newUser := domain.User{
-			Name:     faker.FirstName(),
-			Email:    fmt.Sprintf("user%d@gmail.com", i),
-			Password: password,
-		}
-		if err := m.DB.
-			WithContext(ctx).
-			Create(&newUser).Error; err != nil {
-			return err
-		}
+	password, err := custom_security.NewHashingValue("1234567890")
+	if err != nil {
+		return err
+	}
+	newUser := domain.User{
+		Name:     faker.FirstName(),
+		Email:    fmt.Sprintf("user%d@gmail.com", 1),
+		Password: password,
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Create(&newUser).Error; err != nil {
+		return err
 	}
 	/* user */
 
 	/* product */
-	for i := 1; i <= 100; i++ {
-		// product
-		newProduct := domain.Product{
-			Name:              faker.FirstName(),
-			Overview:          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-			Price:             uint(rand.Intn(500000-10000) + 10000),
-			Stock:             uint(rand.Intn(50-10) + 10),
-			ProductCategoryID: uint(rand.Intn(3-1) + 1),
-			UserID:            uint(rand.Intn(10-1) + 1),
-		}
-		if err := m.DB.
-			WithContext(ctx).
-			Create(&newProduct).Error; err != nil {
-			return err
-		}
+	// create product
+	newProduct := domain.Product{
+		Name:              faker.FirstName(),
+		Overview:          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+		Price:             uint(rand.Intn(500000-10000) + 10000),
+		Stock:             uint(rand.Intn(50-10) + 10),
+		ProductCategoryID: uint(rand.Intn(3-1) + 1),
+		UserID:            newUser.ID,
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Create(&newProduct).Error; err != nil {
+		return err
+	}
 
-		// product image
-		newProductImage := domain.ProductImage{
-			ProductID: uint(i),
-			Path:      "default.jpg",
-		}
-		if err := m.DB.
-			WithContext(ctx).
-			Create(&newProductImage).Error; err != nil {
-			return err
-		}
+	// create product image
+	newProductImage := domain.ProductImage{
+		ProductID: newProduct.ID,
+		Path:      "default.jpg",
+	}
+	if err := m.DB.
+		WithContext(ctx).
+		Create(&newProductImage).Error; err != nil {
+		return err
 	}
 	/* product */
 	return nil

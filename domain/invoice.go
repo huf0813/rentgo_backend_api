@@ -17,7 +17,7 @@ type Invoice struct {
 }
 
 type InvoiceCheckoutRequest struct {
-	CartIDS    []int  `json:"cart_ids"`
+	CartIDS    []uint `json:"cart_ids"`
 	StartDate  string `json:"start_date"`
 	FinishDate string `json:"finish_date"`
 }
@@ -85,7 +85,7 @@ type InvoiceUseCase interface {
 	CreateCheckOut(ctx context.Context,
 		startDate, finishDate time.Time,
 		email string,
-		cartIDS []int) error
+		cartIDS []uint) error
 	UpdateInvoiceOnGoing(ctx context.Context,
 		email string,
 		receiptCode string) error

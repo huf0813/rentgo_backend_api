@@ -15,6 +15,26 @@ func NewCartRepoMysql(db *gorm.DB) domain.CartRepository {
 	return &CartRepoMysql{DB: db}
 }
 
+func (c *CartRepoMysql) IsCartByIDsExist(ctx context.Context,
+	userID uint,
+	cartIDs []uint) (bool, error) {
+	var count int64
+	if err := c.DB.
+		WithContext(ctx).
+		Model(&domain.Cart{}).
+		Where("carts.user_id = ?", userID).
+		Where("carts.id IN ?", cartIDs).
+		Count(&count).Error; err != nil {
+		return false, err
+	}
+	dataLength := int64(len(cartIDs))
+	if count != dataLength {
+		return false, nil
+	} else {
+		return true, nil
+	}
+}
+
 func (c *CartRepoMysql) AddProductToCart(ctx context.Context,
 	quantity int,
 	productID,
