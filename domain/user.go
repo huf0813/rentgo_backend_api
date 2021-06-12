@@ -13,8 +13,8 @@ type User struct {
 	Password       string    `gorm:"not null" json:"password"`
 	Phone          string    `gorm:"unique;default:null" json:"phone"`
 	StoreName      string    `gorm:"unique;default:null" json:"store_name"`
+	IdentityType   string    `gorm:"default:null" json:"identity_type"`
 	IdentityNumber string    `gorm:"unique;default:null" json:"identity_number"`
-	IdentityType   string    `gorm:"unique;default:null" json:"identity_type"`
 	IdentityImage  string    `gorm:"unique;default:null" json:"identity_image"`
 	Invoices       []Invoice `gorm:"foreignKey:UserID" json:"invoices"`
 	Events         []Event   `gorm:"foreignKey:UserID" json:"events"`
@@ -39,6 +39,16 @@ type UserProfileResponse struct {
 	IsVerified bool   `json:"is_verified"`
 }
 
+type VendorResponse struct {
+	VendorID           uint   `json:"vendor_id"`
+	VendorPhone        string `json:"vendor_phone"`
+	VendorName         string `json:"vendor_name"`
+	VendorAddress      string `json:"vendor_address"`
+	VendorEmail        string `json:"vendor_email"`
+	VendorCountReviews string `json:"vendor_count_reviews"`
+	VendorRating       string `json:"vendor_rating"`
+}
+
 type UserRepository interface {
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	SignUp(ctx context.Context, name, email, password string) error
@@ -50,6 +60,7 @@ type UserRepository interface {
 		StorePhone,
 		email string) error
 	CheckVerification(ctx context.Context, email string) (bool, error)
+	SearchVendor(ctx context.Context, storeName string) error
 }
 
 type UserUseCase interface {
