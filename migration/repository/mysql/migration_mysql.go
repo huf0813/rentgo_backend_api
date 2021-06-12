@@ -313,9 +313,19 @@ func (m *MigrationRepoMysql) InvalidFaker(ctx context.Context) error {
 
 		for k := 1; k <= 3; k++ {
 			/* product */
+
+			dataFurniture := []string{
+				"meja",
+				"kursi",
+				"meja",
+				"kursi",
+			}
+
 			// create product
 			newProduct := domain.Product{
-				Name:              faker.FirstName(),
+				Name: fmt.Sprintf("%s %s",
+					dataFurniture[uint(rand.Intn(3-1)+1)],
+					faker.FirstName()),
 				Overview:          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
 				Price:             uint(rand.Intn(500000-10000) + 10000),
 				Stock:             uint(rand.Intn(50-10) + 10),

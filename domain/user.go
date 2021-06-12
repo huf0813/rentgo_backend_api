@@ -60,7 +60,6 @@ type UserRepository interface {
 		StorePhone,
 		email string) error
 	CheckVerification(ctx context.Context, email string) (bool, error)
-	SearchVendor(ctx context.Context, storeName string) error
 }
 
 type UserUseCase interface {

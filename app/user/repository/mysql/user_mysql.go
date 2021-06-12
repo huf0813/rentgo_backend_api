@@ -15,10 +15,6 @@ func NewUserRepoMysql(db *gorm.DB) domain.UserRepository {
 	return &UserRepoMysql{DB: db}
 }
 
-func (u *UserRepoMysql) SearchVendor(ctx context.Context, storeName string) error {
-	return nil
-}
-
 func (u *UserRepoMysql) CheckVerification(ctx context.Context, email string) (bool, error) {
 	var count int64
 	if err := u.DB.
