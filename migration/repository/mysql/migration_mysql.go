@@ -352,5 +352,89 @@ func (m *MigrationRepoMysql) InvalidFaker(ctx context.Context) error {
 		}
 	}
 	/* user */
+
+	// on_going
+	iv1 := domain.Invoice{
+		ReceiptCode:       custom_security.NewRandomShortUUID(),
+		StartDate:         time.Now(),
+		FinishDate:        time.Now().Add((24 * 3) * time.Hour),
+		UserID:            2,
+		InvoiceCategoryID: 1,
+	}
+	if err := m.DB.WithContext(ctx).Create(&iv1).Error; err != nil {
+		return err
+	}
+	ivp1 := domain.InvoiceProduct{
+		ProductID: 2,
+		InvoiceID: iv1.ID,
+		Quantity:  2,
+	}
+	if err := m.DB.WithContext(ctx).Create(&ivp1).Error; err != nil {
+		return err
+	}
+	ivp2 := domain.InvoiceProduct{
+		ProductID: 3,
+		InvoiceID: iv1.ID,
+		Quantity:  2,
+	}
+	if err := m.DB.WithContext(ctx).Create(&ivp2).Error; err != nil {
+		return err
+	}
+
+	// completed
+	iv2 := domain.Invoice{
+		ReceiptCode:       custom_security.NewRandomShortUUID(),
+		UserID:            2,
+		InvoiceCategoryID: 2,
+		StartDate:         time.Now(),
+		FinishDate:        time.Now().Add((24 * 3) * time.Hour),
+	}
+	if err := m.DB.WithContext(ctx).Create(&iv2).Error; err != nil {
+		return err
+	}
+	ivp3 := domain.InvoiceProduct{
+		ProductID: 4,
+		InvoiceID: iv2.ID,
+		Quantity:  2,
+	}
+	if err := m.DB.WithContext(ctx).Create(&ivp3).Error; err != nil {
+		return err
+	}
+	ivp4 := domain.InvoiceProduct{
+		ProductID: 5,
+		InvoiceID: iv2.ID,
+		Quantity:  2,
+	}
+	if err := m.DB.WithContext(ctx).Create(&ivp4).Error; err != nil {
+		return err
+	}
+
+	// to_pay
+	iv3 := domain.Invoice{
+		ReceiptCode:       custom_security.NewRandomShortUUID(),
+		UserID:            2,
+		InvoiceCategoryID: 3,
+		StartDate:         time.Now(),
+		FinishDate:        time.Now().Add((24 * 3) * time.Hour),
+	}
+	if err := m.DB.WithContext(ctx).Create(&iv3).Error; err != nil {
+		return err
+	}
+	ivp5 := domain.InvoiceProduct{
+		ProductID: 6,
+		InvoiceID: iv3.ID,
+		Quantity:  2,
+	}
+	if err := m.DB.WithContext(ctx).Create(&ivp5).Error; err != nil {
+		return err
+	}
+	ivp6 := domain.InvoiceProduct{
+		ProductID: 7,
+		InvoiceID: iv3.ID,
+		Quantity:  2,
+	}
+	if err := m.DB.WithContext(ctx).Create(&ivp6).Error; err != nil {
+		return err
+	}
 	return nil
 }
