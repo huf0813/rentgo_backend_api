@@ -16,7 +16,43 @@ type CartHandler struct {
 func NewCartHandler(userGroup *echo.Group, c domain.CartUseCase) {
 	handler := &CartHandler{CartUseCase: c}
 	userGroup.POST("/cart/create/:product_id", handler.AddProductToCart)
+	userGroup.DELETE("/cart/delete/:cart_id", handler.DeleteProductToCart)
 	userGroup.GET("/cart", handler.FetchCart)
+}
+
+func (c *CartHandler) DeleteProductToCart(echoContext echo.Context) error {
+	cartID := echoContext.Param("cart_id")
+	cartIDInteger, err := strconv.Atoi(cartID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	bearer := echoContext.Request().Header.Get("Authorization")
+	token, err := auth.NewTokenExtraction(bearer)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	ctx := echoContext.Request().Context()
+	if err := c.CartUseCase.DeleteCartByID(ctx,
+		token.Email,
+		uint(cartIDInteger)); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, custom_response.NewCustomResponse(
+			false,
+			err.Error(),
+			nil))
+	}
+
+	return echoContext.JSON(http.StatusOK, custom_response.NewCustomResponse(
+		false,
+		"delete product from cart successfully",
+		nil))
 }
 
 func (c *CartHandler) AddProductToCart(echoContext echo.Context) error {

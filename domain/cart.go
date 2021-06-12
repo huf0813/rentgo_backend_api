@@ -42,4 +42,5 @@ type CartUseCase interface {
 		email string,
 		q *CartAddProductRequest) error
 	FetchCart(ctx context.Context, email string) ([]CartResponse, error)
+	DeleteCartByID(ctx context.Context, email string, cartID uint) error
 }

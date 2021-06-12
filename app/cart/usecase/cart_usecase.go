@@ -22,6 +22,24 @@ func NewCartUseCase(c domain.CartRepository,
 	}
 }
 
+func (c *CartUseCase) DeleteCartByID(ctx context.Context, email string, cartID uint) error {
+	ctx, cancel := context.WithTimeout(ctx, c.timeOut)
+	defer cancel()
+
+	user, err := c.userRepoMysql.GetUserByEmail(ctx, email)
+	if err != nil {
+		return err
+	}
+
+	if err := c.cartRepoMysql.DeleteCartByID(ctx,
+		user.ID,
+		cartID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (c *CartUseCase) AddProductToCart(ctx context.Context, productID int, email string, q *domain.CartAddProductRequest) error {
 	ctx, cancel := context.WithTimeout(ctx, c.timeOut)
 	defer cancel()
