@@ -14,14 +14,40 @@ func NewProductRepository(db *gorm.DB) domain.ProductRepository {
 	return &ProductRepository{DB: db}
 }
 
+func (p *ProductRepository) VendorFetchProductCategory(ctx context.Context) ([]domain.ProductCategoryResponse, error) {
+	var res []domain.ProductCategoryResponse
+
+	if err := p.DB.
+		WithContext(ctx).
+		Model(&domain.ProductCategory{}).
+		Select("product_categories.name as product_category_name, " +
+			"product_categories.id as product_category_id").
+		Find(&res).
+		Error; err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (p *ProductRepository) VendorCreateProduct(ctx context.Context, pc *domain.Product) (uint, error) {
+	if err := p.DB.
+		WithContext(ctx).
+		Create(&pc).
+		Error; err != nil {
+		return 0, err
+	}
+	return pc.ID, nil
+}
+
 func (p *ProductRepository) FetchImagesByID(ctx context.Context, id int) ([]domain.ProductImageResponse, error) {
 	var result []domain.ProductImageResponse
 	if err := p.DB.
 		WithContext(ctx).
 		Model(&domain.Product{}).
 		Select(
-			"product_images.path as path, "+
-				"product_images.id as product_image_id").
+			"product_images.id, "+
+				"product_images.path").
 		Joins("JOIN product_images ON products.id = product_images.product_id").
 		Where("products.id = ?", id).
 		Find(&result).Error; err != nil {

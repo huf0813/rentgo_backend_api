@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"gorm.io/gorm"
+	"mime/multipart"
 )
 
 type Product struct {
@@ -40,7 +41,16 @@ type ProductReviewResponse struct {
 
 type ProductImageResponse struct {
 	ID   int    `json:"product_image_id"`
-	Path string `json:"path"`
+	Path string `json:"product_image_path"`
+}
+
+type ProductRequest struct {
+	Name            string                `json:"name"`
+	Overview        string                `json:"overview"`
+	ProductCategory uint                  `json:"product_category"`
+	Stock           uint                  `json:"stock"`
+	Price           uint                  `json:"price"`
+	ProductImage    *multipart.FileHeader `json:"product_image"`
 }
 
 type ProductRepository interface {
@@ -51,6 +61,8 @@ type ProductRepository interface {
 	FetchImagesByID(ctx context.Context, id int) ([]ProductImageResponse, error)
 	FetchLatestProduct(ctx context.Context) ([]ProductResponse, error)
 	FetchTrendingProduct(ctx context.Context) ([]ProductResponse, error)
+	VendorFetchProductCategory(ctx context.Context) ([]ProductCategoryResponse, error)
+	VendorCreateProduct(ctx context.Context, pc *Product) (uint, error)
 }
 type ProductUseCase interface {
 	FetchByID(ctx context.Context, id int) (ProductResponse, error)
@@ -60,4 +72,6 @@ type ProductUseCase interface {
 	FetchImagesByID(ctx context.Context, id int) ([]ProductImageResponse, error)
 	FetchLatestProduct(ctx context.Context) ([]ProductResponse, error)
 	FetchTrendingProduct(ctx context.Context) ([]ProductResponse, error)
+	VendorFetchProductCategory(ctx context.Context) ([]ProductCategoryResponse, error)
+	VendorCreateProduct(ctx context.Context, pr *ProductRequest, email string) error
 }
